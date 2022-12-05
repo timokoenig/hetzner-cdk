@@ -1,0 +1,39 @@
+{
+  "name": "hetzner-cdk",
+  "version": "0.1.0",
+  "description": "Hetzner Cloud Development Kit",
+  "author": "Timo Koenig <timo@timokoenig.com>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "dev": "tsc-watch",
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/node": "^18.11.10",
+    "axios": "^1.2.0",
+    "chalk": "^4.1.2",
+    "cli-table": "^0.3.11",
+    "commander": "^9.4.1",
+    "dotenv": "^16.0.3",
+    "moment": "^2.29.4",
+    "typescript": "^4.9.3",
+    "yesno": "^0.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "tsc-watch": "^5.0.3"
+  },
+  "keywords": ["hetzner", "cloud", "cdk"],
+  "bugs": {
+    "url": "https://github.com/timokoenig/hetzner-cdk/issues"
+  },
+  "homepage": "https://github.com/timokoenig/hetzner-cdk#readme"
+}
