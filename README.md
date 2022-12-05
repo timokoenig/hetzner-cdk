@@ -4,6 +4,12 @@ Unofficial Cloud Development Kit for Hetzner Cloud
 
 ## Getting Started
 
+### .env
+```
+HETZNER_AUTH_TOKEN=xxx
+```
+
+### index.js
 ```ts
 const cdk = await CDK.init({
     namespace: "space",
