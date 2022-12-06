@@ -1,22 +1,19 @@
 import { HImageFlavor, HImageStatus, HImageType } from "../types/image";
-import { HCPUType, HServerStatus, HStorageType } from "../types/server";
+import {
+  HCPUType,
+  HServer,
+  HServerStatus,
+  HStorageType,
+} from "../types/server";
+import { HLocationMock } from "./location";
 
-export const HServerMock = {
+export const HServerMock: HServer = {
   backup_window: null,
   created: "",
   datacenter: {
     id: 0,
     description: "",
-    location: {
-      id: 0,
-      city: "",
-      country: "",
-      description: "",
-      latitude: 0,
-      longitude: 0,
-      name: "",
-      network_zone: "",
-    },
+    location: HLocationMock,
     name: "",
     server_types: {
       available: [],

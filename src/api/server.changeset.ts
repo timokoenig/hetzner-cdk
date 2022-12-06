@@ -58,7 +58,11 @@ export class ServerAPIChangeset implements IServerAPI {
   }
 
   async getServer(params: ServerGetRequest): Promise<ServerGetResponse> {
-    return this._serverApi.getServer(params);
+    try {
+      return this._serverApi.getServer(params);
+    } catch {
+      return { server: HServerMock };
+    }
   }
 
   async updateServer(

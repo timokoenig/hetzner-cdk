@@ -1,9 +1,11 @@
 import chalk = require("chalk");
 import moment = require("moment");
 import { APIFactory, IAPIFactory } from "../../api/factory";
+import { HIPType } from "../../api/types/floatingip";
 import { HServerStatus } from "../../api/types/server";
 import { ICDK } from "../cdk";
 import { resourceNameFormatter } from "../utils/formatter";
+import { FloatingIP } from "./floatingip";
 import { Resource } from "./resource";
 import { SSHKey } from "./sshkey";
 
@@ -13,12 +15,15 @@ export type ServerOptions = {
   labels?: { [key: string]: string };
   serverType: string;
   userData?: string;
+  enableIPv4?: boolean;
+  enableIPv6?: boolean;
 };
 
 export class Server implements Resource {
   cdk?: ICDK;
   private _options: ServerOptions;
   private _sshKey?: SSHKey;
+  private _floatingIPs: FloatingIP[] = [];
 
   private static WAIT_TIMEOUT_SECONDS = 60;
 
@@ -35,20 +40,37 @@ export class Server implements Resource {
     this._sshKey = sshKey;
   }
 
+  addFloatingIP(floatingIP: FloatingIP): void {
+    floatingIP.cdk = this.cdk;
+    this._floatingIPs.push(floatingIP);
+  }
+
   getAttachedResources(): Resource[] {
-    return this._sshKey ? [this._sshKey] : [];
+    return ([] as Resource[]).concat(
+      this._sshKey ? [this._sshKey] : [],
+      this._floatingIPs
+    );
   }
 
   async apply(apiFactory: IAPIFactory): Promise<number> {
     const namespace = this.cdk?.namespace ?? "";
     const sshkey = await this._sshKey?.apply(apiFactory);
+    const floatingIPs = await Promise.all(
+      this._floatingIPs.map(async (obj) => {
+        const floatingIPId = await obj.apply(apiFactory);
+        const res = await apiFactory.floatingip.getFloatingIP({
+          id: floatingIPId,
+        });
+        return res.floating_ip;
+      })
+    );
 
     const allServers = await apiFactory.server.getAllServers({
       label_selector: `namespace=${namespace}`,
     });
     const server = allServers.find((obj) => obj.name == this.getName());
     if (server) {
-      // SSH Key already exists; check for updates
+      // Server already exists; check for updates
       // TODO check if we really need to update it
       const res = await apiFactory.server.updateServer({
         id: server.id,
@@ -57,7 +79,7 @@ export class Server implements Resource {
       });
       return res.server.id;
     } else {
-      // SSH Key does not exist; create new key
+      // Server does not exist; create new server
       const res = await apiFactory.server.createServer({
         automount: false,
         datacenter: this.cdk?.datacenter.id.toString(),
@@ -68,8 +90,10 @@ export class Server implements Resource {
         networks: undefined,
         placement_group: undefined,
         public_net: {
-          enable_ipv4: true,
-          enable_ipv6: false,
+          enable_ipv4: this._options.enableIPv4 ?? true,
+          enable_ipv6: this._options.enableIPv6 ?? false,
+          ipv4: floatingIPs.find((obj) => obj.type == HIPType.IPV4)?.id,
+          ipv6: floatingIPs.find((obj) => obj.type == HIPType.IPV6)?.id,
         },
         server_type: this._options.serverType,
         ssh_keys: sshkey ? [sshkey] : [],

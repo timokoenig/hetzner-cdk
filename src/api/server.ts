@@ -13,10 +13,6 @@ import {
   ServerUpdateResponse,
 } from "./types/server";
 import client from "./client";
-import { HServerMock } from "./mocks/server";
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { HActionMock } from "./mocks/action";
 
 // Cloud API - Servers
 // https://docs.hetzner.cloud/#servers

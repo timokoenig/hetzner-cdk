@@ -23,19 +23,37 @@ const server = new Server({
 });
 cdk.add(server);
 
-const publicKey = PublicKey.fromFile("id_ed25519.pub");
-const sshKey = new SSHKey({
-    name: "spacekey",
-    publicKey,
-});
-server.addSSHKey(sshKey);
-
 cdk.run();
 ```
 
 - Show Diff `index.js diff`
 - Deploy to Hetzner Cloud `index.js deploy`
 - Destroy from Hetzner Cloud `index.js destroy`
+
+### Add SSH key to server
+
+By default the server will create a root password that is send to you via email. It is recommended to set an SSH key to access the server.
+
+```ts
+const publicKey = PublicKey.fromFile("id_ed25519.pub");
+const sshKey = new SSHKey({
+    name: "spacekey",
+    publicKey,
+});
+server.addSSHKey(sshKey);
+```
+
+### Add IP to server
+
+By default a server will automatically create an IPv4 address, but you will be able to attach an existing Floating IP as well.
+
+```ts
+const ipv4 = new FloatingIP({
+    name: "spaceip",
+    type: "ipv4"
+})
+server.addFloatingIP(ipv4)
+```
 
 ## TODOs
 - [ ] Implement pagination for all requests

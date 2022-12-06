@@ -10,6 +10,7 @@ export enum Operation {
 export enum ResourceType {
   SERVER = "Server",
   SSHKEY = "SSHKey",
+  FLOATINGIP = "FloatingIP",
 }
 
 export interface ResourceChangeset {

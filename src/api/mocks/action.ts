@@ -1,6 +1,6 @@
-import { HActionStatus } from "../types/action";
+import { HAction, HActionStatus } from "../types/action";
 
-export const HActionMock = {
+export const HActionMock: HAction = {
   command: "create",
   error: null,
   finished: null,

@@ -50,7 +50,11 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
   }
 
   async getSSHKey(params: SSHKeyGetRequest): Promise<SSHKeyGetResponse> {
-    return this._sshkeyApi.getSSHKey(params);
+    try {
+      return this._sshkeyApi.getSSHKey(params);
+    } catch {
+      return { ssh_key: HSSHKeyMock };
+    }
   }
 
   async updateSSHKey(

@@ -1,4 +1,6 @@
-export const HSSHKeyMock = {
+import { HSSHKey } from "../types/sshkey";
+
+export const HSSHKeyMock: HSSHKey = {
   created: "",
   fingerprint: "",
   id: 0,
