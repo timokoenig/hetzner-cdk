@@ -2,6 +2,8 @@ import { exit } from "process";
 import { getAllDatacenters } from "../api/datacenter";
 import { APIFactory, APIFactoryChangeset, IAPIFactory } from "../api/factory";
 import { DATACENTER, HDatacenter } from "../api/types/datacenter";
+import { FloatingIP } from "./classes/floatingip";
+import { PrimaryIP } from "./classes/primaryip";
 import { Resource, ResourceChangeset } from "./classes/resource";
 import { Server } from "./classes/server";
 import { SSHKey } from "./classes/sshkey";
@@ -243,6 +245,20 @@ class CDK implements ICDK {
         localResources
           .filter((obj) => obj instanceof SSHKey)
           .map((obj) => obj as SSHKey),
+        this.namespace,
+        apiFactory
+      ),
+      PrimaryIP.deleteUnusedResources(
+        localResources
+          .filter((obj) => obj instanceof PrimaryIP)
+          .map((obj) => obj as PrimaryIP),
+        this.namespace,
+        apiFactory
+      ),
+      FloatingIP.deleteUnusedResources(
+        localResources
+          .filter((obj) => obj instanceof FloatingIP)
+          .map((obj) => obj as FloatingIP),
         this.namespace,
         apiFactory
       ),

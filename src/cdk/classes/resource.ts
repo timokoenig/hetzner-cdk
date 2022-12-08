@@ -11,6 +11,7 @@ export enum ResourceType {
   SERVER = "Server",
   SSHKEY = "SSHKey",
   FLOATINGIP = "FloatingIP",
+  PrimaryIP = "PrimaryIP",
 }
 
 export interface ResourceChangeset {

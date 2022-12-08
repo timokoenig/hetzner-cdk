@@ -45,7 +45,21 @@ server.addSSHKey(sshKey);
 
 ### Add IP to server
 
+By default a server will automatically create an IPv4 address, but you will be able to attach an existing Primary IP as well.
+
+```ts
+const ipv4 = new PrimaryIP({
+    name: "spaceip",
+    type: "ipv4"
+})
+server.addPrimaryIP(ipv4)
+```
+
+### Add Floating IP to server
+
 By default a server will automatically create an IPv4 address, but you will be able to attach an existing Floating IP as well.
+
+❗️ NOTE: Currently not implemented properly!
 
 ```ts
 const ipv4 = new FloatingIP({

@@ -6,6 +6,7 @@ import { HServerStatus } from "../../api/types/server";
 import { ICDK } from "../cdk";
 import { resourceNameFormatter } from "../utils/formatter";
 import { FloatingIP } from "./floatingip";
+import { PrimaryIP } from "./primaryip";
 import { Resource } from "./resource";
 import { SSHKey } from "./sshkey";
 
@@ -24,6 +25,7 @@ export class Server implements Resource {
   private _options: ServerOptions;
   private _sshKey?: SSHKey;
   private _floatingIPs: FloatingIP[] = [];
+  private _primaryIPs: PrimaryIP[] = [];
 
   private static WAIT_TIMEOUT_SECONDS = 60;
 
@@ -45,23 +47,29 @@ export class Server implements Resource {
     this._floatingIPs.push(floatingIP);
   }
 
+  addPrimaryIP(primaryIP: PrimaryIP): void {
+    primaryIP.cdk = this.cdk;
+    this._primaryIPs.push(primaryIP);
+  }
+
   getAttachedResources(): Resource[] {
     return ([] as Resource[]).concat(
       this._sshKey ? [this._sshKey] : [],
-      this._floatingIPs
+      this._floatingIPs,
+      this._primaryIPs
     );
   }
 
   async apply(apiFactory: IAPIFactory): Promise<number> {
     const namespace = this.cdk?.namespace ?? "";
     const sshkey = await this._sshKey?.apply(apiFactory);
-    const floatingIPs = await Promise.all(
-      this._floatingIPs.map(async (obj) => {
-        const floatingIPId = await obj.apply(apiFactory);
-        const res = await apiFactory.floatingip.getFloatingIP({
-          id: floatingIPId,
+    const primaryIPs = await Promise.all(
+      this._primaryIPs.map(async (obj) => {
+        const primaryIPId = await obj.apply(apiFactory);
+        const res = await apiFactory.primaryip.getPrimaryIP({
+          id: primaryIPId,
         });
-        return res.floating_ip;
+        return res.primary_ip;
       })
     );
 
@@ -92,8 +100,8 @@ export class Server implements Resource {
         public_net: {
           enable_ipv4: this._options.enableIPv4 ?? true,
           enable_ipv6: this._options.enableIPv6 ?? false,
-          ipv4: floatingIPs.find((obj) => obj.type == HIPType.IPV4)?.id,
-          ipv6: floatingIPs.find((obj) => obj.type == HIPType.IPV6)?.id,
+          ipv4: primaryIPs.find((obj) => obj.type == HIPType.IPV4)?.id,
+          ipv6: primaryIPs.find((obj) => obj.type == HIPType.IPV6)?.id,
         },
         server_type: this._options.serverType,
         ssh_keys: sshkey ? [sshkey] : [],
