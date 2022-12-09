@@ -113,7 +113,11 @@ export class Server implements Resource {
       // Wait until server is running
       if (apiFactory instanceof APIFactory) {
         const createdAt = moment();
-        await this._waitForServer(apiFactory, res.server.id, createdAt);
+        await this._waitForServerToBeReady(
+          apiFactory,
+          res.server.id,
+          createdAt
+        );
         console.log(chalk.gray(`Server ${res.server.name} is running`));
       }
 
@@ -122,7 +126,7 @@ export class Server implements Resource {
   }
 
   // Request server status until server is running or timeout is reached
-  private async _waitForServer(
+  private async _waitForServerToBeReady(
     apiFactory: IAPIFactory,
     id: number,
     createdAt: moment.Moment
@@ -133,7 +137,25 @@ export class Server implements Resource {
       id,
     });
     if (res.server.status == HServerStatus.RUNNING) return;
-    await this._waitForServer(apiFactory, id, createdAt);
+    await this._waitForServerToBeReady(apiFactory, id, createdAt);
+  }
+
+  // Request server status until server is deleted or timeout is reached
+  private async _waitForServerToBeDeleted(
+    apiFactory: IAPIFactory,
+    id: number,
+    createdAt: moment.Moment
+  ): Promise<void> {
+    if (moment() > createdAt.add(Server.WAIT_TIMEOUT_SECONDS, "seconds"))
+      throw new Error("Server is still running");
+    try {
+      await apiFactory.server.getServer({
+        id,
+      });
+      await this._waitForServerToBeDeleted(apiFactory, id, createdAt);
+    } catch {
+      // Server does not exist anymore
+    }
   }
 
   async delete(apiFactory: IAPIFactory): Promise<void> {
@@ -146,6 +168,13 @@ export class Server implements Resource {
     await apiFactory.server.deleteServer({
       id: server.id,
     });
+
+    // Wait until server has been deleted
+    if (apiFactory instanceof APIFactory) {
+      const createdAt = moment();
+      await this._waitForServerToBeDeleted(apiFactory, server.id, createdAt);
+      console.log(chalk.gray(`Server ${server.name} has been deleted`));
+    }
   }
 
   static async deleteUnusedResources(

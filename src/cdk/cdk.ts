@@ -145,7 +145,17 @@ class CDK implements ICDK {
     });
     if (!ok) return;
 
-    await Promise.all(localResources.map((obj) => obj.delete(apiFactory)));
+    // First delete servers and ssh keys
+    const otherResources = localResources.filter(
+      (obj) => !(obj instanceof FloatingIP) && !(obj instanceof PrimaryIP)
+    );
+    await Promise.all(otherResources.map((obj) => obj.delete(apiFactory)));
+
+    // Then delete the IPs
+    const ipResources = localResources.filter(
+      (obj) => obj instanceof FloatingIP || obj instanceof PrimaryIP
+    );
+    await Promise.all(ipResources.map((obj) => obj.delete(apiFactory)));
 
     console.log(chalk.green("Done"));
   }
