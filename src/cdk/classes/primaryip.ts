@@ -1,3 +1,4 @@
+import chalk = require("chalk");
 import { IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
 import { HAssigneeType } from "../../api/types/primaryip";
@@ -9,6 +10,7 @@ export type PrimaryIPOptions = {
   name: string;
   type: "ipv4" | "ipv6";
   labels?: { [key: string]: string };
+  protected?: boolean;
 };
 
 export class PrimaryIP implements Resource {
@@ -44,6 +46,14 @@ export class PrimaryIP implements Resource {
           namespace,
         },
       });
+
+      // Update IP protection
+      if (this._options.protected !== undefined) {
+        await apiFactory.primaryip.changeProtection(primaryIP.id, {
+          delete: this._options.protected,
+        });
+      }
+
       return res.primary_ip.id;
     } else {
       // PrimaryIP does not exist; create new key
@@ -53,6 +63,9 @@ export class PrimaryIP implements Resource {
         type: this._options.type as HIPType,
         assignee_type: HAssigneeType.SERVER,
         datacenter: this.cdk.datacenter.name,
+        auto_delete:
+          this._options.protected === undefined ||
+          this._options.protected === false,
       });
       return res.primary_ip.id;
     }
@@ -64,7 +77,14 @@ export class PrimaryIP implements Resource {
       label_selector: `namespace=${namespace}`,
     });
     const primaryIP = allPrimaryIPs.find((obj) => obj.name == this.getName());
-    if (!primaryIP) return;
+    if (!primaryIP) {
+      console.log(chalk.red("[PrimaryIP] IP does not exist; skip deletion"));
+      return;
+    }
+    if (primaryIP.auto_delete) {
+      console.log(chalk.yellow("[PrimaryIP] IP is protected; skip deletion"));
+      return;
+    }
     await apiFactory.primaryip.deletePrimaryIP(primaryIP.id);
   }
 
@@ -78,7 +98,9 @@ export class PrimaryIP implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (primaryip) =>
-        localResources.findIndex((obj) => obj.getName() == primaryip.name) == -1
+        localResources.findIndex(
+          (obj) => obj.getName() == primaryip.name && primaryip.auto_delete
+        ) == -1
     );
     await Promise.all(
       resourcesToBeRemoved.map((obj) =>

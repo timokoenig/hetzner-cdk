@@ -78,3 +78,12 @@ export type PrimaryIPUpdateRequest = {
 export type PrimaryIPUpdateResponse = {
   primary_ip: HPrimaryIP;
 };
+
+// Action: Primary IP Protection
+export type PrimaryIPProtectionRequest = {
+  delete: boolean;
+};
+
+export type PrimaryIPProtectionResponse = {
+  action: HAction;
+};

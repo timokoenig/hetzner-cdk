@@ -4,6 +4,8 @@ import {
   PrimaryIPCreateResponse,
   PrimaryIPGetAllRequest,
   PrimaryIPGetResponse,
+  PrimaryIPProtectionRequest,
+  PrimaryIPProtectionResponse,
   PrimaryIPUpdateRequest,
   PrimaryIPUpdateResponse,
 } from "./types/primaryip";
@@ -98,6 +100,26 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
 
     return {
       primary_ip: HPrimaryIPMock,
+    };
+  }
+
+  async changeProtection(
+    id: number,
+    params: PrimaryIPProtectionRequest
+  ): Promise<PrimaryIPProtectionResponse> {
+    const currentData = await this._serverApi.getPrimaryIP(id);
+    if (currentData.primary_ip.auto_delete == params.delete) {
+      this._cdk.changeset.push({
+        operation: Operation.MODIFY,
+        type: ResourceType.PrimaryIP,
+        id: currentData.primary_ip.name,
+        value_old: `protection: ${!currentData.primary_ip.auto_delete}`,
+        value_new: `protection: ${params.delete}`,
+      });
+    }
+
+    return {
+      action: HActionMock,
     };
   }
 }

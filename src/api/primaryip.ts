@@ -10,6 +10,8 @@ import {
   PrimaryIPUpdateRequest,
   PrimaryIPUpdateResponse,
   HPrimaryIP,
+  PrimaryIPProtectionRequest,
+  PrimaryIPProtectionResponse,
 } from "./types/primaryip";
 
 // Cloud API - Primary IP
@@ -26,6 +28,10 @@ export interface IPrimaryIPAPI {
     id: number,
     params: PrimaryIPUpdateRequest
   ): Promise<PrimaryIPUpdateResponse>;
+  changeProtection(
+    id: number,
+    params: PrimaryIPProtectionRequest
+  ): Promise<PrimaryIPProtectionResponse>;
 }
 
 export class PrimaryIPAPI implements IPrimaryIPAPI {
@@ -80,6 +86,17 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
 
     const res: AxiosResponse<PrimaryIPUpdateResponse> = await client.put(
       `/primary_ips/${id}`,
+      params
+    );
+    return res.data;
+  }
+
+  async changeProtection(
+    id: number,
+    params: PrimaryIPProtectionRequest
+  ): Promise<PrimaryIPProtectionResponse> {
+    const res: AxiosResponse<PrimaryIPProtectionResponse> = await client.post(
+      `/primary_ips/${id}/actions/change_protection`,
       params
     );
     return res.data;
