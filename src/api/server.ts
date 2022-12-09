@@ -11,6 +11,7 @@ import {
   ServerUpdateResponse,
 } from "./types/server";
 import client from "./client";
+import chalk = require("chalk");
 
 // Cloud API - Servers
 // https://docs.hetzner.cloud/#servers
@@ -63,6 +64,15 @@ export class ServerAPI implements IServerAPI {
     id: number,
     params: ServerUpdateRequest
   ): Promise<ServerUpdateResponse> {
+    const currentData = await this.getServer(id);
+    if (
+      (!params.name || currentData.server.name == params.name) &&
+      (!params.labels || currentData.server.labels == params.labels)
+    ) {
+      console.log(chalk.gray("[Server] Nothing to update"));
+      return currentData;
+    }
+
     const res: AxiosResponse<ServerUpdateResponse> = await client.put(
       `/servers/${id}`,
       params

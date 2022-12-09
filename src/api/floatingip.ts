@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import chalk = require("chalk");
 import client from "./client";
 import {
   FloatingIPCreateRequest,
@@ -70,6 +71,17 @@ export class FloatingIPAPI implements IFloatingIPAPI {
     id: number,
     params: FloatingIPUpdateRequest
   ): Promise<FloatingIPUpdateResponse> {
+    const currentData = await this.getFloatingIP(id);
+    if (
+      (!params.name || currentData.floating_ip.name == params.name) &&
+      (!params.description ||
+        currentData.floating_ip.description == params.description) &&
+      (!params.labels || currentData.floating_ip.labels == params.labels)
+    ) {
+      console.log(chalk.gray("[FloatingIP] Nothing to update"));
+      return currentData;
+    }
+
     const res: AxiosResponse<FloatingIPUpdateResponse> = await client.put(
       `/floating_ips/${id}`,
       params

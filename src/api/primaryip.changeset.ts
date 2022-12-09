@@ -61,16 +61,41 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
 
   async updatePrimaryIP(
     id: number,
-    _: PrimaryIPUpdateRequest
+    params: PrimaryIPUpdateRequest
   ): Promise<PrimaryIPUpdateResponse> {
-    const res = await this._serverApi.getPrimaryIP(id);
-    this._cdk.changeset.push({
-      operation: Operation.MODIFY,
-      type: ResourceType.PrimaryIP,
-      id: res.primary_ip.name,
-      value_old: "placeholder for old values",
-      value_new: "placeholder for new values",
-    });
+    const currentData = await this._serverApi.getPrimaryIP(id);
+    let valueOld: string[] = [];
+    let valueNew: string[] = [];
+    if (params.name && currentData.primary_ip.name != params.name) {
+      valueOld.push(`name: ${currentData.primary_ip.name}`);
+      valueNew.push(`name: ${params.name}`);
+    }
+    if (
+      params.auto_delete &&
+      currentData.primary_ip.auto_delete != params.auto_delete
+    ) {
+      valueOld.push(`auto_delete: ${currentData.primary_ip.auto_delete}`);
+      valueNew.push(`description: ${params.auto_delete}`);
+    }
+    if (
+      params.labels &&
+      JSON.stringify(currentData.primary_ip.labels) !=
+        JSON.stringify(params.labels)
+    ) {
+      valueOld.push(`labels: ${JSON.stringify(currentData.primary_ip.labels)}`);
+      valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
+    }
+
+    if (valueOld.length > 0) {
+      this._cdk.changeset.push({
+        operation: Operation.MODIFY,
+        type: ResourceType.PrimaryIP,
+        id: currentData.primary_ip.name,
+        value_old: valueOld.join("\n"),
+        value_new: valueNew.join("\n"),
+      });
+    }
+
     return {
       primary_ip: HPrimaryIPMock,
     };

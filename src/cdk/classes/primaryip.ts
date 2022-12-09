@@ -37,7 +37,6 @@ export class PrimaryIP implements Resource {
     const primaryIP = allPrimaryIPs.find((obj) => obj.name == this.getName());
     if (primaryIP) {
       // PrimaryIP already exists; check for updates
-      // TODO check if we really need to update it
       const res = await apiFactory.primaryip.updatePrimaryIP(primaryIP.id, {
         name: this.getName(),
         labels: {

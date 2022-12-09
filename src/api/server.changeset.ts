@@ -63,16 +63,33 @@ export class ServerAPIChangeset implements IServerAPI {
 
   async updateServer(
     id: number,
-    _: ServerUpdateRequest
+    params: ServerUpdateRequest
   ): Promise<ServerUpdateResponse> {
-    const res = await this._serverApi.getServer(id);
-    this._cdk.changeset.push({
-      operation: Operation.MODIFY,
-      type: ResourceType.SERVER,
-      id: res.server.name,
-      value_old: "placeholder for old values",
-      value_new: "placeholder for new values",
-    });
+    const currentData = await this._serverApi.getServer(id);
+    let valueOld: string[] = [];
+    let valueNew: string[] = [];
+    if (params.name && currentData.server.name != params.name) {
+      valueOld.push(`name: ${currentData.server.name}`);
+      valueNew.push(`name: ${params.name}`);
+    }
+    if (
+      params.labels &&
+      JSON.stringify(currentData.server.labels) != JSON.stringify(params.labels)
+    ) {
+      valueOld.push(`labels: ${JSON.stringify(currentData.server.labels)}`);
+      valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
+    }
+
+    if (valueOld.length > 0) {
+      this._cdk.changeset.push({
+        operation: Operation.MODIFY,
+        type: ResourceType.SERVER,
+        id: currentData.server.name,
+        value_old: valueOld.join("\n"),
+        value_new: valueNew.join("\n"),
+      });
+    }
+
     return {
       server: HServerMock,
     };

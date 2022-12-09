@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import chalk = require("chalk");
 import client from "./client";
 import {
   PrimaryIPCreateRequest,
@@ -66,6 +67,17 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
     id: number,
     params: PrimaryIPUpdateRequest
   ): Promise<PrimaryIPUpdateResponse> {
+    const currentData = await this.getPrimaryIP(id);
+    if (
+      (!params.name || currentData.primary_ip.name == params.name) &&
+      (!params.auto_delete ||
+        currentData.primary_ip.auto_delete == params.auto_delete) &&
+      (!params.labels || currentData.primary_ip.labels == params.labels)
+    ) {
+      console.log(chalk.gray("[PrimaryIPs] Nothing to update"));
+      return currentData;
+    }
+
     const res: AxiosResponse<PrimaryIPUpdateResponse> = await client.put(
       `/primary_ips/${id}`,
       params

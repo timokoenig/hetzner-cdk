@@ -57,16 +57,34 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
 
   async updateSSHKey(
     id: number,
-    _: SSHKeyUpdateRequest
+    params: SSHKeyUpdateRequest
   ): Promise<SSHKeyUpdateResponse> {
-    const res = await this._sshkeyApi.getSSHKey(id);
-    this._cdk.changeset.push({
-      operation: Operation.MODIFY,
-      type: ResourceType.SSHKEY,
-      id: res.ssh_key.name,
-      value_old: "placeholder for old values",
-      value_new: "placeholder for new values",
-    });
+    const currentData = await this._sshkeyApi.getSSHKey(id);
+    let valueOld: string[] = [];
+    let valueNew: string[] = [];
+    if (params.name && currentData.ssh_key.name != params.name) {
+      valueOld.push(`name: ${currentData.ssh_key.name}`);
+      valueNew.push(`name: ${params.name}`);
+    }
+    if (
+      params.labels &&
+      JSON.stringify(currentData.ssh_key.labels) !=
+        JSON.stringify(params.labels)
+    ) {
+      valueOld.push(`labels: ${JSON.stringify(currentData.ssh_key.labels)}`);
+      valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
+    }
+
+    if (valueOld.length > 0) {
+      this._cdk.changeset.push({
+        operation: Operation.MODIFY,
+        type: ResourceType.SSHKEY,
+        id: currentData.ssh_key.name,
+        value_old: valueOld.join("\n"),
+        value_new: valueNew.join("\n"),
+      });
+    }
+
     return {
       ssh_key: HSSHKeyMock,
     };

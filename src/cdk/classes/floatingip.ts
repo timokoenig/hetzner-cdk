@@ -36,7 +36,6 @@ export class FloatingIP implements Resource {
     const floatingIP = allFloatingIPs.find((obj) => obj.name == this.getName());
     if (floatingIP) {
       // FloatingIP already exists; check for updates
-      // TODO check if we really need to update it
       const res = await apiFactory.floatingip.updateFloatingIP(floatingIP.id, {
         name: this.getName(),
         labels: {

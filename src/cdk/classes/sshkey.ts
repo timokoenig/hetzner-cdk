@@ -34,7 +34,6 @@ export class SSHKey implements Resource {
     const sshKey = allSSHKeys.find((obj) => obj.name == this.getName());
     if (sshKey) {
       // SSH Key already exists; check for updates
-      // TODO check if we really need to update it
       const res = await apiFactory.sshkey.updateSSHKey(sshKey.id, {
         name: this.getName(),
         labels: {

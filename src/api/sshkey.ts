@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import chalk = require("chalk");
 import client from "./client";
 import {
   HSSHKey,
@@ -60,6 +61,15 @@ export class SSHKeyAPI implements ISSHKeyAPI {
     id: number,
     params: SSHKeyUpdateRequest
   ): Promise<SSHKeyUpdateResponse> {
+    const currentData = await this.getSSHKey(id);
+    if (
+      (!params.name || currentData.ssh_key.name == params.name) &&
+      (!params.labels || currentData.ssh_key.labels == params.labels)
+    ) {
+      console.log(chalk.gray("[SSHKey] Nothing to update"));
+      return currentData;
+    }
+
     const res: AxiosResponse<SSHKeyUpdateResponse> = await client.put(
       `/ssh_keys/${id}`,
       params

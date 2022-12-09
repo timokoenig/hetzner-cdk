@@ -77,7 +77,6 @@ export class Server implements Resource {
     const server = allServers.find((obj) => obj.name == this.getName());
     if (server) {
       // Server already exists; check for updates
-      // TODO check if we really need to update it
       const res = await apiFactory.server.updateServer(server.id, {
         labels: { ...this._options.labels, namespace },
         name: this.getName(),
