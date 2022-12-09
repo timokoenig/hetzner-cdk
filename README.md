@@ -70,7 +70,9 @@ server.addFloatingIP(ipv4)
 ```
 
 ## TODOs
+- [ ] Show all public IPs after deployment
 - [ ] Implement pagination for all requests
+- [ ] Check values of resources that need to be updated
 - [ ] Add option to either destroy only given resources or everything within the namespace
 - [ ] Improve axios error handling
 - [ ] Lock resources so that they can't be deleted
