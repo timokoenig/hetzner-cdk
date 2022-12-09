@@ -2,9 +2,7 @@ import {
   HPrimaryIP,
   PrimaryIPCreateRequest,
   PrimaryIPCreateResponse,
-  PrimaryIPDeleteRequest,
   PrimaryIPGetAllRequest,
-  PrimaryIPGetRequest,
   PrimaryIPGetResponse,
   PrimaryIPUpdateRequest,
   PrimaryIPUpdateResponse,
@@ -44,8 +42,8 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     };
   }
 
-  async deletePrimaryIP(params: PrimaryIPDeleteRequest): Promise<void> {
-    const res = await this._serverApi.getPrimaryIP({ id: params.id });
+  async deletePrimaryIP(id: number): Promise<void> {
+    const res = await this._serverApi.getPrimaryIP(id);
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.PrimaryIP,
@@ -53,20 +51,19 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     });
   }
 
-  async getPrimaryIP(
-    params: PrimaryIPGetRequest
-  ): Promise<PrimaryIPGetResponse> {
+  async getPrimaryIP(id: number): Promise<PrimaryIPGetResponse> {
     try {
-      return await this._serverApi.getPrimaryIP(params);
+      return await this._serverApi.getPrimaryIP(id);
     } catch {
       return { primary_ip: HPrimaryIPMock };
     }
   }
 
   async updatePrimaryIP(
-    params: PrimaryIPUpdateRequest
+    id: number,
+    _: PrimaryIPUpdateRequest
   ): Promise<PrimaryIPUpdateResponse> {
-    const res = await this._serverApi.getPrimaryIP({ id: params.id });
+    const res = await this._serverApi.getPrimaryIP(id);
     this._cdk.changeset.push({
       operation: Operation.MODIFY,
       type: ResourceType.PrimaryIP,
@@ -75,7 +72,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
       value_new: "placeholder for new values",
     });
     return {
-      primary_id: HPrimaryIPMock,
+      primary_ip: HPrimaryIPMock,
     };
   }
 }

@@ -66,9 +66,7 @@ export class Server implements Resource {
     const primaryIPs = await Promise.all(
       this._primaryIPs.map(async (obj) => {
         const primaryIPId = await obj.apply(apiFactory);
-        const res = await apiFactory.primaryip.getPrimaryIP({
-          id: primaryIPId,
-        });
+        const res = await apiFactory.primaryip.getPrimaryIP(primaryIPId);
         return res.primary_ip;
       })
     );
@@ -80,10 +78,9 @@ export class Server implements Resource {
     if (server) {
       // Server already exists; check for updates
       // TODO check if we really need to update it
-      const res = await apiFactory.server.updateServer({
-        id: server.id,
+      const res = await apiFactory.server.updateServer(server.id, {
         labels: { ...this._options.labels, namespace },
-        name: this._options.name,
+        name: this.getName(),
       });
       return res.server.id;
     } else {
@@ -133,9 +130,7 @@ export class Server implements Resource {
   ): Promise<void> {
     if (moment() > createdAt.add(Server.WAIT_TIMEOUT_SECONDS, "seconds"))
       throw new Error("Server is not running");
-    const res = await apiFactory.server.getServer({
-      id,
-    });
+    const res = await apiFactory.server.getServer(id);
     if (res.server.status == HServerStatus.RUNNING) return;
     await this._waitForServerToBeReady(apiFactory, id, createdAt);
   }
@@ -149,9 +144,7 @@ export class Server implements Resource {
     if (moment() > createdAt.add(Server.WAIT_TIMEOUT_SECONDS, "seconds"))
       throw new Error("Server is still running");
     try {
-      await apiFactory.server.getServer({
-        id,
-      });
+      await apiFactory.server.getServer(id);
       await this._waitForServerToBeDeleted(apiFactory, id, createdAt);
     } catch {
       // Server does not exist anymore
@@ -165,9 +158,7 @@ export class Server implements Resource {
     });
     const server = allServers.find((obj) => obj.name == this.getName());
     if (!server) return;
-    await apiFactory.server.deleteServer({
-      id: server.id,
-    });
+    await apiFactory.server.deleteServer(server.id);
 
     // Wait until server has been deleted
     if (apiFactory instanceof APIFactory) {
@@ -190,11 +181,7 @@ export class Server implements Resource {
         localResources.findIndex((obj) => obj.getName() == server.name) == -1
     );
     await Promise.all(
-      resourcesToBeRemoved.map((obj) =>
-        apiFactory.server.deleteServer({
-          id: obj.id,
-        })
-      )
+      resourcesToBeRemoved.map((obj) => apiFactory.server.deleteServer(obj.id))
     );
   }
 }

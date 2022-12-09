@@ -134,26 +134,17 @@ export type ServerCreateResponse = {
 };
 
 // Delete A Server
-export type ServerDeleteRequest = {
-  id: number;
-};
-
 export type ServerDeleteResponse = {
   action: HAction;
 };
 
 // Get A Server
-export type ServerGetRequest = {
-  id: number;
-};
-
 export type ServerGetResponse = {
   server: HServer;
 };
 
 // Update A Server
 export type ServerUpdateRequest = {
-  id: number;
   labels?: { [key: string]: string };
   name?: string;
 };

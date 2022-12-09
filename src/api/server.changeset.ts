@@ -2,10 +2,8 @@ import {
   HServer,
   ServerCreateRequest,
   ServerCreateResponse,
-  ServerDeleteRequest,
   ServerDeleteResponse,
   ServerGetAllRequest,
-  ServerGetRequest,
   ServerGetResponse,
   ServerUpdateRequest,
   ServerUpdateResponse,
@@ -45,10 +43,8 @@ export class ServerAPIChangeset implements IServerAPI {
     };
   }
 
-  async deleteServer(
-    params: ServerDeleteRequest
-  ): Promise<ServerDeleteResponse> {
-    const res = await this._serverApi.getServer({ id: params.id });
+  async deleteServer(id: number): Promise<ServerDeleteResponse> {
+    const res = await this._serverApi.getServer(id);
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.SERVER,
@@ -57,18 +53,19 @@ export class ServerAPIChangeset implements IServerAPI {
     return { action: HActionMock };
   }
 
-  async getServer(params: ServerGetRequest): Promise<ServerGetResponse> {
+  async getServer(id: number): Promise<ServerGetResponse> {
     try {
-      return this._serverApi.getServer(params);
+      return this._serverApi.getServer(id);
     } catch {
       return { server: HServerMock };
     }
   }
 
   async updateServer(
-    params: ServerUpdateRequest
+    id: number,
+    _: ServerUpdateRequest
   ): Promise<ServerUpdateResponse> {
-    const res = await this._serverApi.getServer({ id: params.id });
+    const res = await this._serverApi.getServer(id);
     this._cdk.changeset.push({
       operation: Operation.MODIFY,
       type: ResourceType.SERVER,

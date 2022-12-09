@@ -35,8 +35,7 @@ export class SSHKey implements Resource {
     if (sshKey) {
       // SSH Key already exists; check for updates
       // TODO check if we really need to update it
-      const res = await apiFactory.sshkey.updateSSHKey({
-        id: sshKey.id,
+      const res = await apiFactory.sshkey.updateSSHKey(sshKey.id, {
         name: this.getName(),
         labels: {
           ...this._options.labels,
@@ -62,9 +61,7 @@ export class SSHKey implements Resource {
     });
     const sshKey = allSSHKeys.find((obj) => obj.name == this.getName());
     if (!sshKey) return;
-    await apiFactory.sshkey.deleteSSHKey({
-      id: sshKey.id,
-    });
+    await apiFactory.sshkey.deleteSSHKey(sshKey.id);
   }
 
   static async deleteUnusedResources(
@@ -80,11 +77,7 @@ export class SSHKey implements Resource {
         localResources.findIndex((obj) => obj.getName() == sshkey.name) == -1
     );
     await Promise.all(
-      resourcesToBeRemoved.map((obj) =>
-        apiFactory.sshkey.deleteSSHKey({
-          id: obj.id,
-        })
-      )
+      resourcesToBeRemoved.map((obj) => apiFactory.sshkey.deleteSSHKey(obj.id))
     );
   }
 }

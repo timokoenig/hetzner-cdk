@@ -37,8 +37,7 @@ export class FloatingIP implements Resource {
     if (floatingIP) {
       // FloatingIP already exists; check for updates
       // TODO check if we really need to update it
-      const res = await apiFactory.floatingip.updateFloatingIP({
-        id: floatingIP.id,
+      const res = await apiFactory.floatingip.updateFloatingIP(floatingIP.id, {
         name: this.getName(),
         labels: {
           ...this._options.labels,
@@ -65,9 +64,7 @@ export class FloatingIP implements Resource {
     });
     const floatingIP = allFloatingIPs.find((obj) => obj.name == this.getName());
     if (!floatingIP) return;
-    await apiFactory.floatingip.deleteFloatingIP({
-      id: floatingIP.id,
-    });
+    await apiFactory.floatingip.deleteFloatingIP(floatingIP.id);
   }
 
   static async deleteUnusedResources(
@@ -85,9 +82,7 @@ export class FloatingIP implements Resource {
     );
     await Promise.all(
       resourcesToBeRemoved.map((obj) =>
-        apiFactory.floatingip.deleteFloatingIP({
-          id: obj.id,
-        })
+        apiFactory.floatingip.deleteFloatingIP(obj.id)
       )
     );
   }

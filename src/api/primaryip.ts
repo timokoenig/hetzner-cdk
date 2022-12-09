@@ -3,10 +3,8 @@ import client from "./client";
 import {
   PrimaryIPCreateRequest,
   PrimaryIPCreateResponse,
-  PrimaryIPDeleteRequest,
   PrimaryIPGetAllRequest,
   PrimaryIPGetAllResponse,
-  PrimaryIPGetRequest,
   PrimaryIPGetResponse,
   PrimaryIPUpdateRequest,
   PrimaryIPUpdateResponse,
@@ -21,9 +19,10 @@ export interface IPrimaryIPAPI {
   createPrimaryIP(
     params: PrimaryIPCreateRequest
   ): Promise<PrimaryIPCreateResponse>;
-  deletePrimaryIP(params: PrimaryIPDeleteRequest): Promise<void>;
-  getPrimaryIP(params: PrimaryIPGetRequest): Promise<PrimaryIPGetResponse>;
+  deletePrimaryIP(id: number): Promise<void>;
+  getPrimaryIP(id: number): Promise<PrimaryIPGetResponse>;
   updatePrimaryIP(
+    id: number,
     params: PrimaryIPUpdateRequest
   ): Promise<PrimaryIPUpdateResponse>;
 }
@@ -52,24 +51,23 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
     return res.data;
   }
 
-  async deletePrimaryIP(params: PrimaryIPDeleteRequest): Promise<void> {
-    await client.delete(`/primary_ips/${params.id}`);
+  async deletePrimaryIP(id: number): Promise<void> {
+    await client.delete(`/primary_ips/${id}`);
   }
 
-  async getPrimaryIP(
-    params: PrimaryIPGetRequest
-  ): Promise<PrimaryIPGetResponse> {
+  async getPrimaryIP(id: number): Promise<PrimaryIPGetResponse> {
     const res: AxiosResponse<PrimaryIPGetResponse> = await client.get(
-      `/primary_ips/${params.id}`
+      `/primary_ips/${id}`
     );
     return res.data;
   }
 
   async updatePrimaryIP(
+    id: number,
     params: PrimaryIPUpdateRequest
   ): Promise<PrimaryIPUpdateResponse> {
     const res: AxiosResponse<PrimaryIPUpdateResponse> = await client.put(
-      `/primary_ips/${params.id}`,
+      `/primary_ips/${id}`,
       params
     );
     return res.data;

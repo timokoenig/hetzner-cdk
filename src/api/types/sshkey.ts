@@ -45,23 +45,13 @@ export type SSHKeyCreateResponse = {
   ssh_key: HSSHKey;
 };
 
-// Delete SSH Key
-export type SSHKeyDeleteRequest = {
-  id: number;
-};
-
 // Get SSH Key
-export type SSHKeyGetRequest = {
-  id: number;
-};
-
 export type SSHKeyGetResponse = {
   ssh_key: HSSHKey;
 };
 
 // Update SSH Key
 export type SSHKeyUpdateRequest = {
-  id: number;
   labels?: { [key: string]: string };
   name?: string;
 };

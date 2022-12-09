@@ -3,11 +3,9 @@ import {
   HServer,
   ServerCreateRequest,
   ServerCreateResponse,
-  ServerDeleteRequest,
   ServerDeleteResponse,
   ServerGetAllRequest,
   ServerGetAllResponse,
-  ServerGetRequest,
   ServerGetResponse,
   ServerUpdateRequest,
   ServerUpdateResponse,
@@ -20,9 +18,12 @@ import client from "./client";
 export interface IServerAPI {
   getAllServers(params?: ServerGetAllRequest): Promise<HServer[]>;
   createServer(params: ServerCreateRequest): Promise<ServerCreateResponse>;
-  deleteServer(params: ServerDeleteRequest): Promise<ServerDeleteResponse>;
-  getServer(params: ServerGetRequest): Promise<ServerGetResponse>;
-  updateServer(params: ServerUpdateRequest): Promise<ServerUpdateResponse>;
+  deleteServer(id: number): Promise<ServerDeleteResponse>;
+  getServer(id: number): Promise<ServerGetResponse>;
+  updateServer(
+    id: number,
+    params: ServerUpdateRequest
+  ): Promise<ServerUpdateResponse>;
 }
 
 export class ServerAPI implements IServerAPI {
@@ -44,27 +45,26 @@ export class ServerAPI implements IServerAPI {
     return res.data;
   }
 
-  async deleteServer(
-    params: ServerDeleteRequest
-  ): Promise<ServerDeleteResponse> {
+  async deleteServer(id: number): Promise<ServerDeleteResponse> {
     const res: AxiosResponse<ServerDeleteResponse> = await client.delete(
-      `/servers/${params.id}`
+      `/servers/${id}`
     );
     return res.data;
   }
 
-  async getServer(params: ServerGetRequest): Promise<ServerGetResponse> {
+  async getServer(id: number): Promise<ServerGetResponse> {
     const res: AxiosResponse<ServerGetResponse> = await client.get(
-      `/servers/${params.id}`
+      `/servers/${id}`
     );
     return res.data;
   }
 
   async updateServer(
+    id: number,
     params: ServerUpdateRequest
   ): Promise<ServerUpdateResponse> {
     const res: AxiosResponse<ServerUpdateResponse> = await client.put(
-      `/servers/${params.id}`,
+      `/servers/${id}`,
       params
     );
     return res.data;

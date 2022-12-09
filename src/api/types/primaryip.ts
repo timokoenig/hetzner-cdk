@@ -63,28 +63,18 @@ export type PrimaryIPCreateResponse = {
   primary_ip: HPrimaryIP;
 };
 
-// Delete a Primary IP
-export type PrimaryIPDeleteRequest = {
-  id: number;
-};
-
 // Get a Primary IP
-export type PrimaryIPGetRequest = {
-  id: number;
-};
-
 export type PrimaryIPGetResponse = {
   primary_ip: HPrimaryIP;
 };
 
 // Update a Primary IP
 export type PrimaryIPUpdateRequest = {
-  id: number;
   auto_delete?: boolean;
   labels?: { [key: string]: string };
   name?: string;
 };
 
 export type PrimaryIPUpdateResponse = {
-  primary_id: HPrimaryIP;
+  primary_ip: HPrimaryIP;
 };

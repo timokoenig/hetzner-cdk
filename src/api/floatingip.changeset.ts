@@ -2,10 +2,8 @@ import {
   HFloatingIP,
   FloatingIPCreateRequest,
   FloatingIPCreateResponse,
-  FloatingIPDeleteRequest,
   FloatingIPDeleteResponse,
   FloatingIPGetAllRequest,
-  FloatingIPGetRequest,
   FloatingIPGetResponse,
   FloatingIPUpdateRequest,
   FloatingIPUpdateResponse,
@@ -45,10 +43,8 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     };
   }
 
-  async deleteFloatingIP(
-    params: FloatingIPDeleteRequest
-  ): Promise<FloatingIPDeleteResponse> {
-    const res = await this._serverApi.getFloatingIP({ id: params.id });
+  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse> {
+    const res = await this._serverApi.getFloatingIP(id);
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.FLOATINGIP,
@@ -57,20 +53,19 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     return { floating_ip: HFloatingIPMock };
   }
 
-  async getFloatingIP(
-    params: FloatingIPGetRequest
-  ): Promise<FloatingIPGetResponse> {
+  async getFloatingIP(id: number): Promise<FloatingIPGetResponse> {
     try {
-      return await this._serverApi.getFloatingIP(params);
+      return await this._serverApi.getFloatingIP(id);
     } catch {
       return { floating_ip: HFloatingIPMock };
     }
   }
 
   async updateFloatingIP(
-    params: FloatingIPUpdateRequest
+    id: number,
+    _: FloatingIPUpdateRequest
   ): Promise<FloatingIPUpdateResponse> {
-    const res = await this._serverApi.getFloatingIP({ id: params.id });
+    const res = await this._serverApi.getFloatingIP(id);
     this._cdk.changeset.push({
       operation: Operation.MODIFY,
       type: ResourceType.FLOATINGIP,

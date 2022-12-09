@@ -113,7 +113,7 @@ class CDK implements ICDK {
       await this._deleteUnusedResources(apiFactory);
 
       console.log(chalk.green("Deployment complete"));
-      // TODO show public IPs
+      await this._showPublicServerIPs();
     } catch (err: unknown) {
       console.log(chalk.red("Deployment failed"));
       showError(err as Error);
@@ -273,6 +273,29 @@ class CDK implements ICDK {
         apiFactory
       ),
     ]);
+  }
+
+  // Show all public server IPs
+  private async _showPublicServerIPs(): Promise<void> {
+    const factory = new APIFactory();
+    const servers = await factory.server.getAllServers({
+      label_selector: `namespace=${this.namespace}`,
+    });
+
+    // Print IP table
+    console.log(`\n${chalk.bold("Public IPs")}`);
+    var table = new Table({
+      head: ["Name", "IP", "Type"].map((obj) => chalk.white(obj)),
+    });
+    servers.forEach((obj) => {
+      if (obj.public_net.ipv4) {
+        table.push([obj.name, obj.public_net.ipv4.ip, "ipv4"]);
+      }
+      if (obj.public_net.ipv6) {
+        table.push([obj.name, obj.public_net.ipv6.ip, "ipv6"]);
+      }
+    });
+    console.log(table.toString());
   }
 }
 

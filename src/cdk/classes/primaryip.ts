@@ -38,15 +38,14 @@ export class PrimaryIP implements Resource {
     if (primaryIP) {
       // PrimaryIP already exists; check for updates
       // TODO check if we really need to update it
-      const res = await apiFactory.primaryip.updatePrimaryIP({
-        id: primaryIP.id,
+      const res = await apiFactory.primaryip.updatePrimaryIP(primaryIP.id, {
         name: this.getName(),
         labels: {
           ...this._options.labels,
           namespace,
         },
       });
-      return res.primary_id.id;
+      return res.primary_ip.id;
     } else {
       // PrimaryIP does not exist; create new key
       const res = await apiFactory.primaryip.createPrimaryIP({
@@ -67,9 +66,7 @@ export class PrimaryIP implements Resource {
     });
     const primaryIP = allPrimaryIPs.find((obj) => obj.name == this.getName());
     if (!primaryIP) return;
-    await apiFactory.primaryip.deletePrimaryIP({
-      id: primaryIP.id,
-    });
+    await apiFactory.primaryip.deletePrimaryIP(primaryIP.id);
   }
 
   static async deleteUnusedResources(
@@ -86,9 +83,7 @@ export class PrimaryIP implements Resource {
     );
     await Promise.all(
       resourcesToBeRemoved.map((obj) =>
-        apiFactory.primaryip.deletePrimaryIP({
-          id: obj.id,
-        })
+        apiFactory.primaryip.deletePrimaryIP(obj.id)
       )
     );
   }

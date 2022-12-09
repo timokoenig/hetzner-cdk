@@ -61,26 +61,17 @@ export type FloatingIPCreateResponse = {
 };
 
 // Delete Floating IP
-export type FloatingIPDeleteRequest = {
-  id: number;
-};
-
 export type FloatingIPDeleteResponse = {
   floating_ip: HFloatingIP;
 };
 
 // Get a Floating IP
-export type FloatingIPGetRequest = {
-  id: number;
-};
-
 export type FloatingIPGetResponse = {
   floating_ip: HFloatingIP;
 };
 
 // Update a Floating IP
 export type FloatingIPUpdateRequest = {
-  id: number;
   description?: string;
   labels?: { [key: string]: string };
   name?: string;

@@ -6,9 +6,7 @@ import {
   HSSHKey,
   SSHKeyCreateRequest,
   SSHKeyCreateResponse,
-  SSHKeyDeleteRequest,
   SSHKeyGetAllRequest,
-  SSHKeyGetRequest,
   SSHKeyGetResponse,
   SSHKeyUpdateRequest,
   SSHKeyUpdateResponse,
@@ -40,8 +38,8 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
     };
   }
 
-  async deleteSSHKey(params: SSHKeyDeleteRequest): Promise<void> {
-    const res = await this._sshkeyApi.getSSHKey({ id: params.id });
+  async deleteSSHKey(id: number): Promise<void> {
+    const res = await this._sshkeyApi.getSSHKey(id);
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.SSHKEY,
@@ -49,18 +47,19 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
     });
   }
 
-  async getSSHKey(params: SSHKeyGetRequest): Promise<SSHKeyGetResponse> {
+  async getSSHKey(id: number): Promise<SSHKeyGetResponse> {
     try {
-      return this._sshkeyApi.getSSHKey(params);
+      return this._sshkeyApi.getSSHKey(id);
     } catch {
       return { ssh_key: HSSHKeyMock };
     }
   }
 
   async updateSSHKey(
-    params: SSHKeyUpdateRequest
+    id: number,
+    _: SSHKeyUpdateRequest
   ): Promise<SSHKeyUpdateResponse> {
-    const res = await this._sshkeyApi.getSSHKey({ id: params.id });
+    const res = await this._sshkeyApi.getSSHKey(id);
     this._cdk.changeset.push({
       operation: Operation.MODIFY,
       type: ResourceType.SSHKEY,

@@ -4,10 +4,8 @@ import {
   HSSHKey,
   SSHKeyCreateRequest,
   SSHKeyCreateResponse,
-  SSHKeyDeleteRequest,
   SSHKeyGetAllRequest,
   SSHKeyGetAllResponse,
-  SSHKeyGetRequest,
   SSHKeyGetResponse,
   SSHKeyUpdateRequest,
   SSHKeyUpdateResponse,
@@ -19,9 +17,12 @@ import {
 export interface ISSHKeyAPI {
   getAllSSHKeys(params?: SSHKeyGetAllRequest): Promise<HSSHKey[]>;
   createSSHKey(params: SSHKeyCreateRequest): Promise<SSHKeyCreateResponse>;
-  deleteSSHKey(params: SSHKeyDeleteRequest): Promise<void>;
-  getSSHKey(params: SSHKeyGetRequest): Promise<SSHKeyGetResponse>;
-  updateSSHKey(params: SSHKeyUpdateRequest): Promise<SSHKeyUpdateResponse>;
+  deleteSSHKey(id: number): Promise<void>;
+  getSSHKey(id: number): Promise<SSHKeyGetResponse>;
+  updateSSHKey(
+    id: number,
+    params: SSHKeyUpdateRequest
+  ): Promise<SSHKeyUpdateResponse>;
 }
 
 export class SSHKeyAPI implements ISSHKeyAPI {
@@ -44,22 +45,23 @@ export class SSHKeyAPI implements ISSHKeyAPI {
     return res.data;
   }
 
-  async deleteSSHKey(params: SSHKeyDeleteRequest): Promise<void> {
-    await client.delete(`/ssh_keys/${params.id}`);
+  async deleteSSHKey(id: number): Promise<void> {
+    await client.delete(`/ssh_keys/${id}`);
   }
 
-  async getSSHKey(params: SSHKeyGetRequest): Promise<SSHKeyGetResponse> {
+  async getSSHKey(id: number): Promise<SSHKeyGetResponse> {
     const res: AxiosResponse<SSHKeyGetResponse> = await client.get(
-      `/ssh_keys/${params.id}`
+      `/ssh_keys/${id}`
     );
     return res.data;
   }
 
   async updateSSHKey(
+    id: number,
     params: SSHKeyUpdateRequest
   ): Promise<SSHKeyUpdateResponse> {
     const res: AxiosResponse<SSHKeyUpdateResponse> = await client.put(
-      `/ssh_keys/${params.id}`,
+      `/ssh_keys/${id}`,
       params
     );
     return res.data;

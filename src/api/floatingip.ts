@@ -3,11 +3,9 @@ import client from "./client";
 import {
   FloatingIPCreateRequest,
   FloatingIPCreateResponse,
-  FloatingIPDeleteRequest,
   FloatingIPDeleteResponse,
   FloatingIPGetAllRequest,
   FloatingIPGetAllResponse,
-  FloatingIPGetRequest,
   FloatingIPGetResponse,
   FloatingIPUpdateRequest,
   FloatingIPUpdateResponse,
@@ -22,11 +20,10 @@ export interface IFloatingIPAPI {
   createFloatingIP(
     params: FloatingIPCreateRequest
   ): Promise<FloatingIPCreateResponse>;
-  deleteFloatingIP(
-    params: FloatingIPDeleteRequest
-  ): Promise<FloatingIPDeleteResponse>;
-  getFloatingIP(params: FloatingIPGetRequest): Promise<FloatingIPGetResponse>;
+  deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse>;
+  getFloatingIP(id: number): Promise<FloatingIPGetResponse>;
   updateFloatingIP(
+    id: number,
     params: FloatingIPUpdateRequest
   ): Promise<FloatingIPUpdateResponse>;
 }
@@ -55,29 +52,26 @@ export class FloatingIPAPI implements IFloatingIPAPI {
     return res.data;
   }
 
-  async deleteFloatingIP(
-    params: FloatingIPDeleteRequest
-  ): Promise<FloatingIPDeleteResponse> {
+  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse> {
     const res: AxiosResponse<FloatingIPDeleteResponse> = await client.delete(
-      `/floating_ips/${params.id}`
+      `/floating_ips/${id}`
     );
     return res.data;
   }
 
-  async getFloatingIP(
-    params: FloatingIPGetRequest
-  ): Promise<FloatingIPGetResponse> {
+  async getFloatingIP(id: number): Promise<FloatingIPGetResponse> {
     const res: AxiosResponse<FloatingIPGetResponse> = await client.get(
-      `/floating_ips/${params.id}`
+      `/floating_ips/${id}`
     );
     return res.data;
   }
 
   async updateFloatingIP(
+    id: number,
     params: FloatingIPUpdateRequest
   ): Promise<FloatingIPUpdateResponse> {
     const res: AxiosResponse<FloatingIPUpdateResponse> = await client.put(
-      `/floating_ips/${params.id}`,
+      `/floating_ips/${id}`,
       params
     );
     return res.data;
