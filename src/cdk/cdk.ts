@@ -1,4 +1,7 @@
-import { exit } from "process";
+import chalk from "chalk";
+import Table from "cli-table";
+import { program } from "commander";
+import yesno from "yesno";
 import { getAllDatacenters } from "../api/datacenter";
 import { APIFactory, APIFactoryChangeset, IAPIFactory } from "../api/factory";
 import { DATACENTER, HDatacenter } from "../api/types/datacenter";
@@ -8,12 +11,11 @@ import { Resource, ResourceChangeset } from "./classes/resource";
 import { Server } from "./classes/server";
 import { SSHKey } from "./classes/sshkey";
 import { formatChangesetTableRow, showError } from "./utils/formatter";
-const chalk = require("chalk");
-const Table = require("cli-table");
-const { program } = require("commander");
-const yesno = require("yesno");
+// import packageJSON from ;
 
 const CDK_VERSION = "0.1.0";
+
+const ALL_AVAILABLE_RESOURCES = [Server, SSHKey, PrimaryIP, FloatingIP];
 
 export enum CDKMode {
   DIFF,
@@ -34,7 +36,7 @@ type Config = {
   datacenter: DATACENTER;
 };
 
-class CDK implements ICDK {
+export class CDK implements ICDK {
   private _resources: Resource[] = [];
   mode: CDKMode = CDKMode.DIFF;
   namespace: string;
@@ -129,7 +131,7 @@ class CDK implements ICDK {
       // *all* will delete everything within the namespace
       // TODO add implementation
       console.log(chalk.yellow("Not implemented"));
-      exit(1);
+      process.exit(1);
     } else {
       // Only delete resources from given project
       localResources = this._resources
@@ -243,36 +245,19 @@ class CDK implements ICDK {
       .map((obj) => [obj, ...obj.getAttachedResources()])
       .flatMap((obj) => obj);
 
-    await Promise.all([
-      Server.deleteUnusedResources(
-        localResources
-          .filter((obj) => obj instanceof Server)
-          .map((obj) => obj as Server),
-        this.namespace,
-        apiFactory
-      ),
-      SSHKey.deleteUnusedResources(
-        localResources
-          .filter((obj) => obj instanceof SSHKey)
-          .map((obj) => obj as SSHKey),
-        this.namespace,
-        apiFactory
-      ),
-      PrimaryIP.deleteUnusedResources(
-        localResources
-          .filter((obj) => obj instanceof PrimaryIP)
-          .map((obj) => obj as PrimaryIP),
-        this.namespace,
-        apiFactory
-      ),
-      FloatingIP.deleteUnusedResources(
-        localResources
-          .filter((obj) => obj instanceof FloatingIP)
-          .map((obj) => obj as FloatingIP),
-        this.namespace,
-        apiFactory
-      ),
-    ]);
+    await Promise.all(
+      ALL_AVAILABLE_RESOURCES.map((resourceClass) =>
+        resourceClass.deleteUnusedResources(
+          localResources
+            .filter(
+              (obj) => (obj as Object).constructor.name == resourceClass.name
+            )
+            .map((obj) => obj.getName()),
+          this.namespace,
+          apiFactory
+        )
+      )
+    );
   }
 
   // Show all public server IPs
@@ -298,5 +283,3 @@ class CDK implements ICDK {
     console.log(table.toString());
   }
 }
-
-export default CDK;

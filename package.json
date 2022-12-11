@@ -4,14 +4,13 @@
   "description": "Hetzner Cloud Development Kit",
   "author": "Timo Koenig <timo@timokoenig.com>",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "/dist"
-  ],
+  "type": "module",
+  "main": "dist/hetzner-cdk.cjs",
+  "module": "dist/hetzner-cdk.mjs",
+  "typings": "dist/hetzner-cdk.d.ts",
   "scripts": {
     "dev": "tsc-watch",
-    "build": "npx tsc",
+    "build": "rollup -c",
     "start": "node dist/index.js",
     "test": "npx jest --silent"
   },
@@ -22,12 +21,17 @@
     "cli-table": "^0.3.11",
     "commander": "^9.4.1",
     "dotenv": "^16.0.3",
+    "esbuild": "^0.16.4",
     "moment": "^2.29.4",
+    "rollup": "^3.7.3",
+    "rollup-plugin-dts": "^5.0.0",
+    "rollup-plugin-esbuild": "^5.0.0",
     "ts-jest": "^29.0.3",
     "typescript": "^4.9.3",
     "yesno": "^0.4.0"
   },
   "devDependencies": {
+    "@types/cli-table": "^0.3.1",
     "@types/jest": "^29.2.4",
     "jest": "^29.3.1",
     "nodemon": "^2.0.20",

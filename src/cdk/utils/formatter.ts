@@ -1,6 +1,5 @@
 import axios from "axios";
-import chalk = require("chalk");
-import { exit } from "process";
+import chalk from "chalk";
 import { Operation, ResourceChangeset } from "../classes/resource";
 
 // Convert changeset to table row
@@ -67,7 +66,7 @@ export function showError(err: Error): void {
 export function resourceNameFormatter(namespace: string, name: string): string {
   if (namespace == "") {
     console.log(chalk.red("Missing namespace"));
-    exit(1);
+    process.exit(1);
   }
   return `${namespace}-${name
     .toLowerCase()

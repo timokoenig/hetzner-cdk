@@ -64,7 +64,7 @@ export class SSHKey implements Resource {
   }
 
   static async deleteUnusedResources(
-    localResources: SSHKey[],
+    localResourceNames: string[],
     namespace: string,
     apiFactory: IAPIFactory
   ): Promise<void> {
@@ -73,7 +73,7 @@ export class SSHKey implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (sshkey) =>
-        localResources.findIndex((obj) => obj.getName() == sshkey.name) == -1
+        localResourceNames.findIndex((name) => name == sshkey.name) == -1
     );
     await Promise.all(
       resourcesToBeRemoved.map((obj) => apiFactory.sshkey.deleteSSHKey(obj.id))

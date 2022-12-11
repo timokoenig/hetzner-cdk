@@ -1,11 +1,13 @@
 import axios, { AxiosResponse } from "axios";
-import { exit } from "process";
-const chalk = require("chalk");
+import chalk from "chalk";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const authToken = process.env.HETZNER_AUTH_TOKEN;
 if (!authToken) {
   console.log(chalk.red(`Missing environment variable 'HETZNER_AUTH_TOKEN'`));
-  exit(1);
+  process.exit(1);
 }
 
 // Set config defaults when creating the instance

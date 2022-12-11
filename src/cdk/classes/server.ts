@@ -1,5 +1,5 @@
-import chalk = require("chalk");
-import moment = require("moment");
+import chalk from "chalk";
+import moment from "moment";
 import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
 import { HServerStatus } from "../../api/types/server";
@@ -184,7 +184,7 @@ export class Server implements Resource {
   }
 
   static async deleteUnusedResources(
-    localResources: Server[],
+    localResourceNames: string[],
     namespace: string,
     apiFactory: IAPIFactory
   ): Promise<void> {
@@ -193,8 +193,8 @@ export class Server implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (server) =>
-        localResources.findIndex(
-          (obj) => obj.getName() == server.name && !server.protection.delete
+        localResourceNames.findIndex(
+          (name) => name == server.name && !server.protection.delete
         ) == -1
     );
     await Promise.all(

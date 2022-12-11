@@ -1,4 +1,6 @@
 import { AxiosResponse } from "axios";
+import chalk from "chalk";
+import client from "./client";
 import {
   HServer,
   ServerCreateRequest,
@@ -12,8 +14,6 @@ import {
   ServerUpdateRequest,
   ServerUpdateResponse,
 } from "./types/server";
-import client from "./client";
-import chalk = require("chalk");
 
 // Cloud API - Servers
 // https://docs.hetzner.cloud/#servers

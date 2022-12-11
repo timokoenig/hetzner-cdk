@@ -1,17 +1,17 @@
 import { AxiosResponse } from "axios";
-import chalk = require("chalk");
+import chalk from "chalk";
 import client from "./client";
 import {
+  HPrimaryIP,
   PrimaryIPCreateRequest,
   PrimaryIPCreateResponse,
   PrimaryIPGetAllRequest,
   PrimaryIPGetAllResponse,
   PrimaryIPGetResponse,
-  PrimaryIPUpdateRequest,
-  PrimaryIPUpdateResponse,
-  HPrimaryIP,
   PrimaryIPProtectionRequest,
   PrimaryIPProtectionResponse,
+  PrimaryIPUpdateRequest,
+  PrimaryIPUpdateResponse,
 } from "./types/primaryip";
 
 // Cloud API - Primary IP

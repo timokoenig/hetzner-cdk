@@ -1,4 +1,4 @@
-import chalk = require("chalk");
+import chalk from "chalk";
 import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
 import { ICDK } from "../cdk";
@@ -86,7 +86,7 @@ export class FloatingIP implements Resource {
   }
 
   static async deleteUnusedResources(
-    localResources: FloatingIP[],
+    localResourceNames: string[],
     namespace: string,
     apiFactory: IAPIFactory
   ): Promise<void> {
@@ -95,9 +95,8 @@ export class FloatingIP implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (floatingIP) =>
-        localResources.findIndex(
-          (obj) =>
-            obj.getName() == floatingIP.name && !floatingIP.protection.delete
+        localResourceNames.findIndex(
+          (name) => name == floatingIP.name && !floatingIP.protection.delete
         ) == -1
     );
     await Promise.all(

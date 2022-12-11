@@ -1,21 +1,20 @@
+import { ICDK } from "../cdk/cdk";
+import { Operation, ResourceType } from "../cdk/classes/resource";
+import { IFloatingIPAPI } from "./floatingip";
+import { HActionMock } from "./mocks/action";
+import { HFloatingIPMock } from "./mocks/floatingip";
 import {
-  HFloatingIP,
   FloatingIPCreateRequest,
   FloatingIPCreateResponse,
   FloatingIPDeleteResponse,
   FloatingIPGetAllRequest,
   FloatingIPGetResponse,
-  FloatingIPUpdateRequest,
-  FloatingIPUpdateResponse,
   FloatingIPProtectionRequest,
   FloatingIPProtectionResponse,
+  FloatingIPUpdateRequest,
+  FloatingIPUpdateResponse,
+  HFloatingIP,
 } from "./types/floatingip";
-import { HFloatingIPMock } from "./mocks/floatingip";
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { HActionMock } from "./mocks/action";
-import { IFloatingIPAPI } from "./floatingip";
-import chalk = require("chalk");
 
 export class FloatingIPAPIChangeset implements IFloatingIPAPI {
   private _cdk: ICDK;

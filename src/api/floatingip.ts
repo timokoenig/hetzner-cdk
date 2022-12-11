@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import chalk = require("chalk");
+import chalk from "chalk";
 import client from "./client";
 import {
   FloatingIPCreateRequest,

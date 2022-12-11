@@ -1,6 +1,6 @@
+import chalk from "chalk";
 import { Operation } from "../classes/resource";
 import { formatChangesetTableRow, resourceNameFormatter } from "./formatter";
-import chalk = require("chalk");
 
 describe("formatChangesetTableRow", () => {
   test("ADD", () => {
