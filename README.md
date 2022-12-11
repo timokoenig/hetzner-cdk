@@ -28,7 +28,7 @@ cdk.run();
 
 - Show Diff `index.js diff`
 - Deploy to Hetzner Cloud `index.js deploy`
-- Destroy from Hetzner Cloud `index.js destroy`
+- Destroy on Hetzner Cloud `index.js destroy`
 
 ### Add SSH key to server
 
