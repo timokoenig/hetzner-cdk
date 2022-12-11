@@ -8,7 +8,7 @@ on:
       - main
 jobs:
   install-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Install npm dependencies
