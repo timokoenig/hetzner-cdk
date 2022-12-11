@@ -8,6 +8,8 @@ import {
   FloatingIPGetAllRequest,
   FloatingIPGetAllResponse,
   FloatingIPGetResponse,
+  FloatingIPProtectionRequest,
+  FloatingIPProtectionResponse,
   FloatingIPUpdateRequest,
   FloatingIPUpdateResponse,
   HFloatingIP,
@@ -21,12 +23,16 @@ export interface IFloatingIPAPI {
   createFloatingIP(
     params: FloatingIPCreateRequest
   ): Promise<FloatingIPCreateResponse>;
-  deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse>;
+  deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse | null>;
   getFloatingIP(id: number): Promise<FloatingIPGetResponse>;
   updateFloatingIP(
     id: number,
     params: FloatingIPUpdateRequest
   ): Promise<FloatingIPUpdateResponse>;
+  changeProtection(
+    id: number,
+    params: FloatingIPProtectionRequest
+  ): Promise<FloatingIPProtectionResponse>;
 }
 
 export class FloatingIPAPI implements IFloatingIPAPI {
@@ -53,7 +59,12 @@ export class FloatingIPAPI implements IFloatingIPAPI {
     return res.data;
   }
 
-  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse> {
+  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse | null> {
+    const obj = await this.getFloatingIP(id);
+    if (obj.floating_ip.protection.delete) {
+      // Floating IP is protected
+      return null;
+    }
     const res: AxiosResponse<FloatingIPDeleteResponse> = await client.delete(
       `/floating_ips/${id}`
     );
@@ -84,6 +95,17 @@ export class FloatingIPAPI implements IFloatingIPAPI {
 
     const res: AxiosResponse<FloatingIPUpdateResponse> = await client.put(
       `/floating_ips/${id}`,
+      params
+    );
+    return res.data;
+  }
+
+  async changeProtection(
+    id: number,
+    params: FloatingIPProtectionRequest
+  ): Promise<FloatingIPProtectionResponse> {
+    const res: AxiosResponse<FloatingIPProtectionResponse> = await client.post(
+      `/floating_ips/${id}/actions/change_protection`,
       params
     );
     return res.data;

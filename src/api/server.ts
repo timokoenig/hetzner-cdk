@@ -7,6 +7,8 @@ import {
   ServerGetAllRequest,
   ServerGetAllResponse,
   ServerGetResponse,
+  ServerProtectionRequest,
+  ServerProtectionResponse,
   ServerUpdateRequest,
   ServerUpdateResponse,
 } from "./types/server";
@@ -19,12 +21,16 @@ import chalk = require("chalk");
 export interface IServerAPI {
   getAllServers(params?: ServerGetAllRequest): Promise<HServer[]>;
   createServer(params: ServerCreateRequest): Promise<ServerCreateResponse>;
-  deleteServer(id: number): Promise<ServerDeleteResponse>;
+  deleteServer(id: number): Promise<ServerDeleteResponse | null>;
   getServer(id: number): Promise<ServerGetResponse>;
   updateServer(
     id: number,
     params: ServerUpdateRequest
   ): Promise<ServerUpdateResponse>;
+  changeProtection(
+    id: number,
+    params: ServerProtectionRequest
+  ): Promise<ServerProtectionResponse>;
 }
 
 export class ServerAPI implements IServerAPI {
@@ -46,7 +52,12 @@ export class ServerAPI implements IServerAPI {
     return res.data;
   }
 
-  async deleteServer(id: number): Promise<ServerDeleteResponse> {
+  async deleteServer(id: number): Promise<ServerDeleteResponse | null> {
+    const obj = await this.getServer(id);
+    if (obj.server.protection.delete) {
+      // Server is protected
+      return null;
+    }
     const res: AxiosResponse<ServerDeleteResponse> = await client.delete(
       `/servers/${id}`
     );
@@ -75,6 +86,17 @@ export class ServerAPI implements IServerAPI {
 
     const res: AxiosResponse<ServerUpdateResponse> = await client.put(
       `/servers/${id}`,
+      params
+    );
+    return res.data;
+  }
+
+  async changeProtection(
+    id: number,
+    params: ServerProtectionRequest
+  ): Promise<ServerProtectionResponse> {
+    const res: AxiosResponse<ServerProtectionResponse> = await client.post(
+      `/servers/${id}/actions/change_protection`,
       params
     );
     return res.data;

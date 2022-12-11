@@ -7,6 +7,8 @@ import {
   FloatingIPGetResponse,
   FloatingIPUpdateRequest,
   FloatingIPUpdateResponse,
+  FloatingIPProtectionRequest,
+  FloatingIPProtectionResponse,
 } from "./types/floatingip";
 import { HFloatingIPMock } from "./mocks/floatingip";
 import { ICDK } from "../cdk/cdk";
@@ -44,8 +46,12 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     };
   }
 
-  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse> {
+  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse | null> {
     const res = await this._serverApi.getFloatingIP(id);
+    if (res.floating_ip.protection.delete) {
+      // Floating IP is protected
+      return null;
+    }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.FLOATINGIP,
@@ -103,6 +109,26 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
 
     return {
       floating_ip: HFloatingIPMock,
+    };
+  }
+
+  async changeProtection(
+    id: number,
+    params: FloatingIPProtectionRequest
+  ): Promise<FloatingIPProtectionResponse> {
+    const currentData = await this._serverApi.getFloatingIP(id);
+    if (currentData.floating_ip.protection.delete != params.delete) {
+      this._cdk.changeset.push({
+        operation: Operation.MODIFY,
+        type: ResourceType.FLOATINGIP,
+        id: currentData.floating_ip.name,
+        value_old: `protection: ${currentData.floating_ip.protection.delete}`,
+        value_new: `protection: ${params.delete}`,
+      });
+    }
+
+    return {
+      action: HActionMock,
     };
   }
 }

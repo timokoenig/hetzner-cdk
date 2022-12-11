@@ -73,5 +73,3 @@ server.addFloatingIP(ipv4)
 - [ ] Implement pagination for all requests
 - [ ] Add option to either destroy only given resources or everything within the namespace
 - [ ] Improve axios error handling
-- [ ] Protect resources so that they can't be deleted (FloatingIP, Server, SSHKey)
-- [ ] Exclude protected resources from being deleted

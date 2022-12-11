@@ -5,6 +5,8 @@ import {
   ServerDeleteResponse,
   ServerGetAllRequest,
   ServerGetResponse,
+  ServerProtectionRequest,
+  ServerProtectionResponse,
   ServerUpdateRequest,
   ServerUpdateResponse,
 } from "./types/server";
@@ -43,8 +45,12 @@ export class ServerAPIChangeset implements IServerAPI {
     };
   }
 
-  async deleteServer(id: number): Promise<ServerDeleteResponse> {
+  async deleteServer(id: number): Promise<ServerDeleteResponse | null> {
     const res = await this._serverApi.getServer(id);
+    if (res.server.protection.delete) {
+      // Server is protected
+      return null;
+    }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.SERVER,
@@ -92,6 +98,26 @@ export class ServerAPIChangeset implements IServerAPI {
 
     return {
       server: HServerMock,
+    };
+  }
+
+  async changeProtection(
+    id: number,
+    params: ServerProtectionRequest
+  ): Promise<ServerProtectionResponse> {
+    const currentData = await this._serverApi.getServer(id);
+    if (currentData.server.protection.delete != params.delete) {
+      this._cdk.changeset.push({
+        operation: Operation.MODIFY,
+        type: ResourceType.SERVER,
+        id: currentData.server.name,
+        value_old: `protection: ${currentData.server.protection.delete}`,
+        value_new: `protection: ${params.delete}`,
+      });
+    }
+
+    return {
+      action: HActionMock,
     };
   }
 }

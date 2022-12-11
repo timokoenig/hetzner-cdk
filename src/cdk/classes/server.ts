@@ -18,6 +18,7 @@ export type ServerOptions = {
   userData?: string;
   enableIPv4?: boolean;
   enableIPv6?: boolean;
+  protected?: boolean;
 };
 
 export class Server implements Resource {
@@ -106,8 +107,8 @@ export class Server implements Resource {
         volumes: [],
       });
 
-      // Wait until server is running
       if (apiFactory instanceof APIFactory) {
+        // Wait until server is running
         const createdAt = moment();
         await this._waitForServerToBeReady(
           apiFactory,
@@ -115,6 +116,14 @@ export class Server implements Resource {
           createdAt
         );
         console.log(chalk.gray(`Server ${res.server.name} is running`));
+
+        // Update Server protection
+        if (this._options.protected !== undefined) {
+          await apiFactory.server.changeProtection(res.server.id, {
+            delete: this._options.protected,
+            rebuild: this._options.protected, // currently needs to be the same as `deleted`
+          });
+        }
       }
 
       return res.server.id;
@@ -156,7 +165,14 @@ export class Server implements Resource {
       label_selector: `namespace=${namespace}`,
     });
     const server = allServers.find((obj) => obj.name == this.getName());
-    if (!server) return;
+    if (!server) {
+      console.log(chalk.red("[Server] Server does not exist; skip deletion"));
+      return;
+    }
+    if (server.protection.delete) {
+      console.log(chalk.yellow("[Server] Server is protected; skip deletion"));
+      return;
+    }
     await apiFactory.server.deleteServer(server.id);
 
     // Wait until server has been deleted
@@ -177,7 +193,9 @@ export class Server implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (server) =>
-        localResources.findIndex((obj) => obj.getName() == server.name) == -1
+        localResources.findIndex(
+          (obj) => obj.getName() == server.name && !server.protection.delete
+        ) == -1
     );
     await Promise.all(
       resourcesToBeRemoved.map((obj) => apiFactory.server.deleteServer(obj.id))

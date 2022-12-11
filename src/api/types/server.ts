@@ -152,3 +152,13 @@ export type ServerUpdateRequest = {
 export type ServerUpdateResponse = {
   server: HServer;
 };
+
+// Action: Server Protection
+export type ServerProtectionRequest = {
+  delete: boolean;
+  rebuild: boolean;
+};
+
+export type ServerProtectionResponse = {
+  action: HAction;
+};

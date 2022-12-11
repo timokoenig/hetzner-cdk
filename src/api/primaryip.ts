@@ -59,7 +59,12 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
   }
 
   async deletePrimaryIP(id: number): Promise<void> {
-    await client.delete(`/primary_ips/${id}`);
+    const res = await this.getPrimaryIP(id);
+    if (res.primary_ip.protection.delete) {
+      // Primary IP is protected
+      return;
+    }
+    return await client.delete(`/primary_ips/${id}`);
   }
 
   async getPrimaryIP(id: number): Promise<PrimaryIPGetResponse> {

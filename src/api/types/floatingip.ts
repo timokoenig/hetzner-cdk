@@ -80,3 +80,12 @@ export type FloatingIPUpdateRequest = {
 export type FloatingIPUpdateResponse = {
   floating_ip: HFloatingIP;
 };
+
+// Action: Floating IP Protection
+export type FloatingIPProtectionRequest = {
+  delete: boolean;
+};
+
+export type FloatingIPProtectionResponse = {
+  action: HAction;
+};

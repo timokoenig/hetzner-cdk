@@ -1,4 +1,5 @@
-import { IAPIFactory } from "../../api/factory";
+import chalk = require("chalk");
+import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
 import { ICDK } from "../cdk";
 import { resourceNameFormatter } from "../utils/formatter";
@@ -8,6 +9,7 @@ export type FloatingIPOptions = {
   name: string;
   type: "ipv4" | "ipv6";
   labels?: { [key: string]: string };
+  protected?: boolean;
 };
 
 export class FloatingIP implements Resource {
@@ -52,6 +54,16 @@ export class FloatingIP implements Resource {
         type: this._options.type as HIPType,
         home_location: this.cdk.datacenter.location.name,
       });
+
+      if (apiFactory instanceof APIFactory) {
+        // Update IP protection
+        if (this._options.protected !== undefined) {
+          await apiFactory.floatingip.changeProtection(res.floating_ip.id, {
+            delete: this._options.protected,
+          });
+        }
+      }
+
       return res.floating_ip.id;
     }
   }
@@ -62,7 +74,14 @@ export class FloatingIP implements Resource {
       label_selector: `namespace=${namespace}`,
     });
     const floatingIP = allFloatingIPs.find((obj) => obj.name == this.getName());
-    if (!floatingIP) return;
+    if (!floatingIP) {
+      console.log(chalk.red("[FloatingIP] IP does not exist; skip deletion"));
+      return;
+    }
+    if (floatingIP.protection.delete) {
+      console.log(chalk.yellow("[FloatingIP] IP is protected; skip deletion"));
+      return;
+    }
     await apiFactory.floatingip.deleteFloatingIP(floatingIP.id);
   }
 
@@ -76,8 +95,10 @@ export class FloatingIP implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (floatingIP) =>
-        localResources.findIndex((obj) => obj.getName() == floatingIP.name) ==
-        -1
+        localResources.findIndex(
+          (obj) =>
+            obj.getName() == floatingIP.name && !floatingIP.protection.delete
+        ) == -1
     );
     await Promise.all(
       resourcesToBeRemoved.map((obj) =>

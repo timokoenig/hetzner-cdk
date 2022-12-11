@@ -1,5 +1,5 @@
 import chalk = require("chalk");
-import { IAPIFactory } from "../../api/factory";
+import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
 import { HAssigneeType } from "../../api/types/primaryip";
 import { ICDK } from "../cdk";
@@ -46,14 +46,6 @@ export class PrimaryIP implements Resource {
           namespace,
         },
       });
-
-      // Update IP protection
-      if (this._options.protected !== undefined) {
-        await apiFactory.primaryip.changeProtection(primaryIP.id, {
-          delete: this._options.protected,
-        });
-      }
-
       return res.primary_ip.id;
     } else {
       // PrimaryIP does not exist; create new key
@@ -63,10 +55,17 @@ export class PrimaryIP implements Resource {
         type: this._options.type as HIPType,
         assignee_type: HAssigneeType.SERVER,
         datacenter: this.cdk.datacenter.name,
-        auto_delete:
-          this._options.protected === undefined ||
-          this._options.protected === false,
       });
+
+      if (apiFactory instanceof APIFactory) {
+        // Update IP protection
+        if (this._options.protected !== undefined) {
+          await apiFactory.primaryip.changeProtection(res.primary_ip.id, {
+            delete: this._options.protected,
+          });
+        }
+      }
+
       return res.primary_ip.id;
     }
   }
@@ -81,7 +80,7 @@ export class PrimaryIP implements Resource {
       console.log(chalk.red("[PrimaryIP] IP does not exist; skip deletion"));
       return;
     }
-    if (primaryIP.auto_delete) {
+    if (primaryIP.protection.delete) {
       console.log(chalk.yellow("[PrimaryIP] IP is protected; skip deletion"));
       return;
     }
@@ -97,9 +96,10 @@ export class PrimaryIP implements Resource {
       label_selector: `namespace=${namespace}`,
     });
     const resourcesToBeRemoved = remoteResources.filter(
-      (primaryip) =>
+      (primaryIP) =>
         localResources.findIndex(
-          (obj) => obj.getName() == primaryip.name && primaryip.auto_delete
+          (obj) =>
+            obj.getName() == primaryIP.name && !primaryIP.protection.delete
         ) == -1
     );
     await Promise.all(

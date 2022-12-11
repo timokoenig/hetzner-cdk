@@ -46,6 +46,10 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
 
   async deletePrimaryIP(id: number): Promise<void> {
     const res = await this._serverApi.getPrimaryIP(id);
+    if (res.primary_ip.protection.delete) {
+      // Primary IP is protected
+      return;
+    }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.PrimaryIP,
@@ -108,12 +112,12 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     params: PrimaryIPProtectionRequest
   ): Promise<PrimaryIPProtectionResponse> {
     const currentData = await this._serverApi.getPrimaryIP(id);
-    if (currentData.primary_ip.auto_delete == params.delete) {
+    if (currentData.primary_ip.protection.delete != params.delete) {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
         type: ResourceType.PrimaryIP,
         id: currentData.primary_ip.name,
-        value_old: `protection: ${!currentData.primary_ip.auto_delete}`,
+        value_old: `protection: ${currentData.primary_ip.protection.delete}`,
         value_new: `protection: ${params.delete}`,
       });
     }
