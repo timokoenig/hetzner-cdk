@@ -12,7 +12,7 @@
     "dev": "tsc-watch",
     "build": "rollup -c",
     "start": "node dist/index.js",
-    "test": "npx jest --silent"
+    "test": "npx jest --silent --coverage"
   },
   "dependencies": {
     "@types/node": "^18.11.10",
