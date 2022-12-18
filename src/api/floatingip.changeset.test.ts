@@ -2,6 +2,7 @@ import { ICDK } from "../cdk/cdk";
 import { Operation, ResourceType } from "../cdk/classes/resource";
 import { CDKMock } from "../cdk/__mocks__/cdk";
 import { FloatingIPAPIChangeset } from "./floatingip.changeset";
+import { HActionMock } from "./mocks/action";
 import { HFloatingIPMock } from "./mocks/floatingip";
 import { HIPType } from "./types/floatingip";
 import { FloatingIPAPIMock } from "./__mocks__/floatingip";
@@ -141,6 +142,15 @@ describe("FloatingIPAPIChangeset", () => {
       const res = await sut.updateFloatingIP(1, {});
       expect(res).toMatchObject(HFloatingIPMock);
       expect(cdk.changeset.length).toBe(0);
+    });
+  });
+
+  describe("changeProtection", () => {
+    test("succeeds", async () => {
+      const res = await sut.changeProtection(1, {
+        delete: true,
+      });
+      expect(res).toMatchObject(HActionMock);
     });
   });
 });

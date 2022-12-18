@@ -1,5 +1,6 @@
 import mockAxios from "../__mocks__/axios";
 import { FloatingIPAPI } from "./floatingip";
+import { HActionMock } from "./mocks/action";
 import { HFloatingIPMock } from "./mocks/floatingip";
 import { HIPType } from "./types/floatingip";
 
@@ -135,6 +136,18 @@ describe("FloatingIPAPI", () => {
         name: "old",
       });
       expect(res).toMatchObject(existingData);
+    });
+  });
+
+  describe("changeProtection", () => {
+    test("succeeds", async () => {
+      mockAxios.post.mockResolvedValueOnce({
+        data: { action: HActionMock },
+      });
+      const res = await sut.changeProtection(1, {
+        delete: true,
+      });
+      expect(res).toMatchObject(HActionMock);
     });
   });
 });
