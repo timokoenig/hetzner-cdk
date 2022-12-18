@@ -6,4 +6,4 @@ import { PublicKey } from "./cdk/classes/publickey";
 import { Server } from "./cdk/classes/server";
 import { SSHKey } from "./cdk/classes/sshkey";
 
-export { CDK, Server, DATACENTER, SSHKey, PublicKey, FloatingIP, PrimaryIP };
+export { CDK, DATACENTER, Server, SSHKey, PublicKey, FloatingIP, PrimaryIP };
