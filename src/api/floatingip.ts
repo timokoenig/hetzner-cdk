@@ -20,15 +20,13 @@ import {
 
 export interface IFloatingIPAPI {
   getAllFloatingIPs(params?: FloatingIPGetAllRequest): Promise<HFloatingIP[]>;
-  createFloatingIP(
-    params: FloatingIPCreateRequest
-  ): Promise<FloatingIPCreateResponse>;
-  deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse | null>;
-  getFloatingIP(id: number): Promise<FloatingIPGetResponse>;
+  createFloatingIP(params: FloatingIPCreateRequest): Promise<HFloatingIP>;
+  deleteFloatingIP(id: number): Promise<HFloatingIP | null>;
+  getFloatingIP(id: number): Promise<HFloatingIP>;
   updateFloatingIP(
     id: number,
     params: FloatingIPUpdateRequest
-  ): Promise<FloatingIPUpdateResponse>;
+  ): Promise<HFloatingIP>;
   changeProtection(
     id: number,
     params: FloatingIPProtectionRequest
@@ -51,43 +49,42 @@ export class FloatingIPAPI implements IFloatingIPAPI {
 
   async createFloatingIP(
     params: FloatingIPCreateRequest
-  ): Promise<FloatingIPCreateResponse> {
+  ): Promise<HFloatingIP> {
     const res: AxiosResponse<FloatingIPCreateResponse> = await client.post(
       "/floating_ips",
       params
     );
-    return res.data;
+    return res.data.floating_ip;
   }
 
-  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse | null> {
+  async deleteFloatingIP(id: number): Promise<HFloatingIP | null> {
     const obj = await this.getFloatingIP(id);
-    if (obj.floating_ip.protection.delete) {
+    if (obj.protection.delete) {
       // Floating IP is protected
       return null;
     }
     const res: AxiosResponse<FloatingIPDeleteResponse> = await client.delete(
       `/floating_ips/${id}`
     );
-    return res.data;
+    return res.data.floating_ip;
   }
 
-  async getFloatingIP(id: number): Promise<FloatingIPGetResponse> {
+  async getFloatingIP(id: number): Promise<HFloatingIP> {
     const res: AxiosResponse<FloatingIPGetResponse> = await client.get(
       `/floating_ips/${id}`
     );
-    return res.data;
+    return res.data.floating_ip;
   }
 
   async updateFloatingIP(
     id: number,
     params: FloatingIPUpdateRequest
-  ): Promise<FloatingIPUpdateResponse> {
+  ): Promise<HFloatingIP> {
     const currentData = await this.getFloatingIP(id);
     if (
-      (!params.name || currentData.floating_ip.name == params.name) &&
-      (!params.description ||
-        currentData.floating_ip.description == params.description) &&
-      (!params.labels || currentData.floating_ip.labels == params.labels)
+      (!params.name || currentData.name == params.name) &&
+      (!params.description || currentData.description == params.description) &&
+      (!params.labels || currentData.labels == params.labels)
     ) {
       console.log(chalk.gray("[FloatingIP] Nothing to update"));
       return currentData;
@@ -97,7 +94,7 @@ export class FloatingIPAPI implements IFloatingIPAPI {
       `/floating_ips/${id}`,
       params
     );
-    return res.data;
+    return res.data.floating_ip;
   }
 
   async changeProtection(

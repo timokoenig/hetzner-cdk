@@ -45,7 +45,7 @@ export class FloatingIP implements Resource {
           namespace,
         },
       });
-      return res.floating_ip.id;
+      return res.id;
     } else {
       // FloatingIP does not exist; create new key
       const res = await apiFactory.floatingip.createFloatingIP({
@@ -58,13 +58,13 @@ export class FloatingIP implements Resource {
       if (apiFactory instanceof APIFactory) {
         // Update IP protection
         if (this._options.protected !== undefined) {
-          await apiFactory.floatingip.changeProtection(res.floating_ip.id, {
+          await apiFactory.floatingip.changeProtection(res.id, {
             delete: this._options.protected,
           });
         }
       }
 
-      return res.floating_ip.id;
+      return res.id;
     }
   }
 

@@ -5,14 +5,10 @@ import { HActionMock } from "./mocks/action";
 import { HFloatingIPMock } from "./mocks/floatingip";
 import {
   FloatingIPCreateRequest,
-  FloatingIPCreateResponse,
-  FloatingIPDeleteResponse,
   FloatingIPGetAllRequest,
-  FloatingIPGetResponse,
   FloatingIPProtectionRequest,
   FloatingIPProtectionResponse,
   FloatingIPUpdateRequest,
-  FloatingIPUpdateResponse,
   HFloatingIP,
 } from "./types/floatingip";
 
@@ -33,66 +29,57 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
 
   async createFloatingIP(
     params: FloatingIPCreateRequest
-  ): Promise<FloatingIPCreateResponse> {
+  ): Promise<HFloatingIP> {
     this._cdk.changeset.push({
       operation: Operation.ADD,
       type: ResourceType.FLOATINGIP,
       id: params.name,
     });
-    return {
-      action: HActionMock,
-      floating_ip: HFloatingIPMock,
-    };
+    return HFloatingIPMock;
   }
 
-  async deleteFloatingIP(id: number): Promise<FloatingIPDeleteResponse | null> {
+  async deleteFloatingIP(id: number): Promise<HFloatingIP | null> {
     const res = await this._serverApi.getFloatingIP(id);
-    if (res.floating_ip.protection.delete) {
+    if (res.protection.delete) {
       // Floating IP is protected
       return null;
     }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.FLOATINGIP,
-      id: res.floating_ip.name,
+      id: res.name,
     });
-    return { floating_ip: HFloatingIPMock };
+    return HFloatingIPMock;
   }
 
-  async getFloatingIP(id: number): Promise<FloatingIPGetResponse> {
+  async getFloatingIP(id: number): Promise<HFloatingIP> {
     try {
       return await this._serverApi.getFloatingIP(id);
     } catch {
-      return { floating_ip: HFloatingIPMock };
+      return HFloatingIPMock;
     }
   }
 
   async updateFloatingIP(
     id: number,
     params: FloatingIPUpdateRequest
-  ): Promise<FloatingIPUpdateResponse> {
+  ): Promise<HFloatingIP> {
     const currentData = await this._serverApi.getFloatingIP(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
-    if (params.name && currentData.floating_ip.name != params.name) {
-      valueOld.push(`name: ${currentData.floating_ip.name}`);
+    if (params.name && currentData.name != params.name) {
+      valueOld.push(`name: ${currentData.name}`);
       valueNew.push(`name: ${params.name}`);
     }
-    if (
-      params.description &&
-      currentData.floating_ip.description != params.description
-    ) {
-      valueOld.push(`description: ${currentData.floating_ip.description}`);
+    if (params.description && currentData.description != params.description) {
+      valueOld.push(`description: ${currentData.description}`);
       valueNew.push(`description: ${params.description}`);
     }
     if (
       params.labels &&
-      JSON.stringify(currentData.floating_ip.labels) !=
-        JSON.stringify(params.labels)
+      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
     ) {
-      valueOld.push(
-        `labels: ${JSON.stringify(currentData.floating_ip.labels)}`
-      );
+      valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }
 
@@ -100,15 +87,13 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
         type: ResourceType.FLOATINGIP,
-        id: currentData.floating_ip.name,
+        id: currentData.name,
         value_old: valueOld.join("/n"),
         value_new: valueNew.join("/n"),
       });
     }
 
-    return {
-      floating_ip: HFloatingIPMock,
-    };
+    return HFloatingIPMock;
   }
 
   async changeProtection(
@@ -116,12 +101,12 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     params: FloatingIPProtectionRequest
   ): Promise<FloatingIPProtectionResponse> {
     const currentData = await this._serverApi.getFloatingIP(id);
-    if (currentData.floating_ip.protection.delete != params.delete) {
+    if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
         type: ResourceType.FLOATINGIP,
-        id: currentData.floating_ip.name,
-        value_old: `protection: ${currentData.floating_ip.protection.delete}`,
+        id: currentData.name,
+        value_old: `protection: ${currentData.protection.delete}`,
         value_new: `protection: ${params.delete}`,
       });
     }
