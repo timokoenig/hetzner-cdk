@@ -81,7 +81,7 @@ export class Server implements Resource {
         labels: { ...this._options.labels, namespace },
         name: this.getName(),
       });
-      return res.server.id;
+      return res.id;
     } else {
       // Server does not exist; create new server
       const res = await apiFactory.server.createServer({
@@ -109,23 +109,19 @@ export class Server implements Resource {
       if (apiFactory instanceof APIFactory) {
         // Wait until server is running
         const createdAt = moment();
-        await this._waitForServerToBeReady(
-          apiFactory,
-          res.server.id,
-          createdAt
-        );
-        console.log(chalk.gray(`Server ${res.server.name} is running`));
+        await this._waitForServerToBeReady(apiFactory, res.id, createdAt);
+        console.log(chalk.gray(`Server ${res.name} is running`));
 
         // Update Server protection
         if (this._options.protected !== undefined) {
-          await apiFactory.server.changeProtection(res.server.id, {
+          await apiFactory.server.changeProtection(res.id, {
             delete: this._options.protected,
             rebuild: this._options.protected, // currently needs to be the same as `deleted`
           });
         }
       }
 
-      return res.server.id;
+      return res.id;
     }
   }
 
@@ -138,7 +134,7 @@ export class Server implements Resource {
     if (moment() > createdAt.add(Server.WAIT_TIMEOUT_SECONDS, "seconds"))
       throw new Error("Server is not running");
     const res = await apiFactory.server.getServer(id);
-    if (res.server.status == HServerStatus.RUNNING) return;
+    if (res.status == HServerStatus.RUNNING) return;
     await this._waitForServerToBeReady(apiFactory, id, createdAt);
   }
 

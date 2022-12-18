@@ -1,20 +1,16 @@
-import {
-  HServer,
-  ServerCreateRequest,
-  ServerCreateResponse,
-  ServerDeleteResponse,
-  ServerGetAllRequest,
-  ServerGetResponse,
-  ServerProtectionRequest,
-  ServerProtectionResponse,
-  ServerUpdateRequest,
-  ServerUpdateResponse,
-} from "./types/server";
-import { HServerMock } from "./mocks/server";
 import { ICDK } from "../cdk/cdk";
 import { Operation, ResourceType } from "../cdk/classes/resource";
 import { HActionMock } from "./mocks/action";
+import { HServerMock } from "./mocks/server";
 import { IServerAPI } from "./server";
+import { HAction } from "./types/action";
+import {
+  HServer,
+  ServerCreateRequest,
+  ServerGetAllRequest,
+  ServerProtectionRequest,
+  ServerUpdateRequest,
+} from "./types/server";
 
 export class ServerAPIChangeset implements IServerAPI {
   private _cdk: ICDK;
@@ -29,60 +25,53 @@ export class ServerAPIChangeset implements IServerAPI {
     return this._serverApi.getAllServers(params);
   }
 
-  async createServer(
-    params: ServerCreateRequest
-  ): Promise<ServerCreateResponse> {
+  async createServer(params: ServerCreateRequest): Promise<HServer> {
     this._cdk.changeset.push({
       operation: Operation.ADD,
       type: ResourceType.SERVER,
       id: params.name,
     });
-    return {
-      action: HActionMock,
-      next_action: [],
-      root_password: null,
-      server: HServerMock,
-    };
+    return HServerMock;
   }
 
-  async deleteServer(id: number): Promise<ServerDeleteResponse | null> {
+  async deleteServer(id: number): Promise<boolean> {
     const res = await this._serverApi.getServer(id);
-    if (res.server.protection.delete) {
+    if (res.protection.delete) {
       // Server is protected
-      return null;
+      return false;
     }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.SERVER,
-      id: res.server.name,
+      id: res.name,
     });
-    return { action: HActionMock };
+    return true;
   }
 
-  async getServer(id: number): Promise<ServerGetResponse> {
+  async getServer(id: number): Promise<HServer> {
     try {
       return this._serverApi.getServer(id);
     } catch {
-      return { server: HServerMock };
+      return HServerMock;
     }
   }
 
   async updateServer(
     id: number,
     params: ServerUpdateRequest
-  ): Promise<ServerUpdateResponse> {
+  ): Promise<HServer> {
     const currentData = await this._serverApi.getServer(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
-    if (params.name && currentData.server.name != params.name) {
-      valueOld.push(`name: ${currentData.server.name}`);
+    if (params.name && currentData.name != params.name) {
+      valueOld.push(`name: ${currentData.name}`);
       valueNew.push(`name: ${params.name}`);
     }
     if (
       params.labels &&
-      JSON.stringify(currentData.server.labels) != JSON.stringify(params.labels)
+      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
     ) {
-      valueOld.push(`labels: ${JSON.stringify(currentData.server.labels)}`);
+      valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }
 
@@ -90,34 +79,30 @@ export class ServerAPIChangeset implements IServerAPI {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
         type: ResourceType.SERVER,
-        id: currentData.server.name,
+        id: currentData.name,
         value_old: valueOld.join("\n"),
         value_new: valueNew.join("\n"),
       });
     }
 
-    return {
-      server: HServerMock,
-    };
+    return HServerMock;
   }
 
   async changeProtection(
     id: number,
     params: ServerProtectionRequest
-  ): Promise<ServerProtectionResponse> {
+  ): Promise<HAction> {
     const currentData = await this._serverApi.getServer(id);
-    if (currentData.server.protection.delete != params.delete) {
+    if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
         type: ResourceType.SERVER,
-        id: currentData.server.name,
-        value_old: `protection: ${currentData.server.protection.delete}`,
+        id: currentData.name,
+        value_old: `protection: ${currentData.protection.delete}`,
         value_new: `protection: ${params.delete}`,
       });
     }
 
-    return {
-      action: HActionMock,
-    };
+    return HActionMock;
   }
 }
