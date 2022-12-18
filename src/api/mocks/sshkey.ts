@@ -5,6 +5,6 @@ export const HSSHKeyMock: HSSHKey = {
   fingerprint: "",
   id: 0,
   labels: {},
-  name: "",
+  name: "space-key",
   public_key: "",
 };
