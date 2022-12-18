@@ -61,6 +61,12 @@ describe("SSHKeyAPIChangeset", () => {
       expect(res).toMatchObject(HSSHKeyMock);
       expect(cdk.changeset.length).toBe(0);
     });
+    test("fails with mock fallback", async () => {
+      api.getSSHKeyResult = Promise.reject("error");
+      const res = await sut.getSSHKey(1);
+      expect(res).toMatchObject(HSSHKeyMock);
+      expect(cdk.changeset.length).toBe(0);
+    });
   });
 
   describe("updateSSHKey", () => {

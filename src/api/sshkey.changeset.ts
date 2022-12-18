@@ -43,7 +43,7 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
 
   async getSSHKey(id: number): Promise<HSSHKey> {
     try {
-      return this._sshkeyApi.getSSHKey(id);
+      return await this._sshkeyApi.getSSHKey(id);
     } catch {
       return HSSHKeyMock;
     }

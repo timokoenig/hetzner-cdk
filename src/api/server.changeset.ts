@@ -50,7 +50,7 @@ export class ServerAPIChangeset implements IServerAPI {
 
   async getServer(id: number): Promise<HServer> {
     try {
-      return this._serverApi.getServer(id);
+      return await this._serverApi.getServer(id);
     } catch {
       return HServerMock;
     }

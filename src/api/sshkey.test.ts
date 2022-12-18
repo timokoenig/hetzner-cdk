@@ -14,6 +14,15 @@ describe("SSHKeyAPI", () => {
       expect(res.length).toBe(1);
       expect(res[0]).toMatchObject(HSSHKeyMock);
     });
+
+    test("succeeds with object", async () => {
+      mockAxios.get.mockResolvedValueOnce({
+        data: { ssh_keys: HSSHKeyMock },
+      });
+      const res = await sut.getAllSSHKeys({});
+      expect(res.length).toBe(1);
+      expect(res[0]).toMatchObject(HSSHKeyMock);
+    });
   });
 
   describe("createSSHKey", () => {

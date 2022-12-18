@@ -73,6 +73,12 @@ describe("ServerAPIChangeset", () => {
       expect(res).toMatchObject(HServerMock);
       expect(cdk.changeset.length).toBe(0);
     });
+    test("fails with mock fallback", async () => {
+      api.getServerResult = Promise.reject("error");
+      const res = await sut.getServer(1);
+      expect(res).toMatchObject(HServerMock);
+      expect(cdk.changeset.length).toBe(0);
+    });
   });
 
   describe("updateServer", () => {

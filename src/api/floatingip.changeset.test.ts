@@ -73,6 +73,12 @@ describe("FloatingIPAPIChangeset", () => {
       expect(res).toMatchObject(HFloatingIPMock);
       expect(cdk.changeset.length).toBe(0);
     });
+    test("fails with mock fallback", async () => {
+      api.getFloatingIPResult = Promise.reject("error");
+      const res = await sut.getFloatingIP(1);
+      expect(res).toMatchObject(HFloatingIPMock);
+      expect(cdk.changeset.length).toBe(0);
+    });
   });
 
   describe("updateFloatingIP", () => {

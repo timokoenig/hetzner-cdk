@@ -75,6 +75,12 @@ describe("PrimaryIPAPIChangeset", () => {
       expect(res).toMatchObject(HPrimaryIPMock);
       expect(cdk.changeset.length).toBe(0);
     });
+    test("fails with mock fallback", async () => {
+      api.getPrimaryIPResult = Promise.reject("error");
+      const res = await sut.getPrimaryIP(1);
+      expect(res).toMatchObject(HPrimaryIPMock);
+      expect(cdk.changeset.length).toBe(0);
+    });
   });
 
   describe("updatePrimaryIP", () => {
