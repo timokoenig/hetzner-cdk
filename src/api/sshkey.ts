@@ -17,13 +17,10 @@ import {
 
 export interface ISSHKeyAPI {
   getAllSSHKeys(params?: SSHKeyGetAllRequest): Promise<HSSHKey[]>;
-  createSSHKey(params: SSHKeyCreateRequest): Promise<SSHKeyCreateResponse>;
-  deleteSSHKey(id: number): Promise<void>;
-  getSSHKey(id: number): Promise<SSHKeyGetResponse>;
-  updateSSHKey(
-    id: number,
-    params: SSHKeyUpdateRequest
-  ): Promise<SSHKeyUpdateResponse>;
+  createSSHKey(params: SSHKeyCreateRequest): Promise<HSSHKey>;
+  deleteSSHKey(id: number): Promise<boolean>;
+  getSSHKey(id: number): Promise<HSSHKey>;
+  updateSSHKey(id: number, params: SSHKeyUpdateRequest): Promise<HSSHKey>;
 }
 
 export class SSHKeyAPI implements ISSHKeyAPI {
@@ -36,35 +33,34 @@ export class SSHKeyAPI implements ISSHKeyAPI {
     return [res.data.ssh_keys];
   }
 
-  async createSSHKey(
-    params: SSHKeyCreateRequest
-  ): Promise<SSHKeyCreateResponse> {
+  async createSSHKey(params: SSHKeyCreateRequest): Promise<HSSHKey> {
     const res: AxiosResponse<SSHKeyCreateResponse> = await client.post(
       "/ssh_keys",
       params
     );
-    return res.data;
+    return res.data.ssh_key;
   }
 
-  async deleteSSHKey(id: number): Promise<void> {
+  async deleteSSHKey(id: number): Promise<boolean> {
     await client.delete(`/ssh_keys/${id}`);
+    return true;
   }
 
-  async getSSHKey(id: number): Promise<SSHKeyGetResponse> {
+  async getSSHKey(id: number): Promise<HSSHKey> {
     const res: AxiosResponse<SSHKeyGetResponse> = await client.get(
       `/ssh_keys/${id}`
     );
-    return res.data;
+    return res.data.ssh_key;
   }
 
   async updateSSHKey(
     id: number,
     params: SSHKeyUpdateRequest
-  ): Promise<SSHKeyUpdateResponse> {
+  ): Promise<HSSHKey> {
     const currentData = await this.getSSHKey(id);
     if (
-      (!params.name || currentData.ssh_key.name == params.name) &&
-      (!params.labels || currentData.ssh_key.labels == params.labels)
+      (!params.name || currentData.name == params.name) &&
+      (!params.labels || currentData.labels == params.labels)
     ) {
       console.log(chalk.gray("[SSHKey] Nothing to update"));
       return currentData;
@@ -74,6 +70,6 @@ export class SSHKeyAPI implements ISSHKeyAPI {
       `/ssh_keys/${id}`,
       params
     );
-    return res.data;
+    return res.data.ssh_key;
   }
 }

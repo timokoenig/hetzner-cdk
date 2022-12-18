@@ -41,7 +41,7 @@ export class SSHKey implements Resource {
           namespace,
         },
       });
-      return res.ssh_key.id;
+      return res.id;
     } else {
       // SSH Key does not exist; create new key
       const res = await apiFactory.sshkey.createSSHKey({
@@ -49,7 +49,7 @@ export class SSHKey implements Resource {
         labels: { ...this._options.labels, namespace },
         public_key: this._options.publicKey.key,
       });
-      return res.ssh_key.id;
+      return res.id;
     }
   }
 

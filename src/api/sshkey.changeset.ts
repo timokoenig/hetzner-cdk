@@ -5,11 +5,8 @@ import { ISSHKeyAPI } from "./sshkey";
 import {
   HSSHKey,
   SSHKeyCreateRequest,
-  SSHKeyCreateResponse,
   SSHKeyGetAllRequest,
-  SSHKeyGetResponse,
   SSHKeyUpdateRequest,
-  SSHKeyUpdateResponse,
 } from "./types/sshkey";
 
 export class SSHKeyAPIChangeset implements ISSHKeyAPI {
@@ -25,53 +22,49 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
     return this._sshkeyApi.getAllSSHKeys(params);
   }
 
-  async createSSHKey(
-    params: SSHKeyCreateRequest
-  ): Promise<SSHKeyCreateResponse> {
+  async createSSHKey(params: SSHKeyCreateRequest): Promise<HSSHKey> {
     this._cdk.changeset.push({
       operation: Operation.ADD,
       type: ResourceType.SSHKEY,
       id: params.name,
     });
-    return {
-      ssh_key: HSSHKeyMock,
-    };
+    return HSSHKeyMock;
   }
 
-  async deleteSSHKey(id: number): Promise<void> {
+  async deleteSSHKey(id: number): Promise<boolean> {
     const res = await this._sshkeyApi.getSSHKey(id);
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.SSHKEY,
-      id: res.ssh_key.name,
+      id: res.name,
     });
+    return true;
   }
 
-  async getSSHKey(id: number): Promise<SSHKeyGetResponse> {
+  async getSSHKey(id: number): Promise<HSSHKey> {
     try {
       return this._sshkeyApi.getSSHKey(id);
     } catch {
-      return { ssh_key: HSSHKeyMock };
+      return HSSHKeyMock;
     }
   }
 
   async updateSSHKey(
     id: number,
     params: SSHKeyUpdateRequest
-  ): Promise<SSHKeyUpdateResponse> {
+  ): Promise<HSSHKey> {
     const currentData = await this._sshkeyApi.getSSHKey(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
-    if (params.name && currentData.ssh_key.name != params.name) {
-      valueOld.push(`name: ${currentData.ssh_key.name}`);
+    if (params.name && currentData.name != params.name) {
+      valueOld.push(`name: ${currentData.name}`);
       valueNew.push(`name: ${params.name}`);
     }
     if (
       params.labels &&
-      JSON.stringify(currentData.ssh_key.labels) !=
-        JSON.stringify(params.labels)
+      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
     ) {
-      valueOld.push(`labels: ${JSON.stringify(currentData.ssh_key.labels)}`);
+      valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }
 
@@ -79,14 +72,12 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
         type: ResourceType.SSHKEY,
-        id: currentData.ssh_key.name,
+        id: currentData.name,
         value_old: valueOld.join("\n"),
         value_new: valueNew.join("\n"),
       });
     }
 
-    return {
-      ssh_key: HSSHKeyMock,
-    };
+    return HSSHKeyMock;
   }
 }
