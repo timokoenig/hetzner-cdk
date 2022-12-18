@@ -102,7 +102,7 @@ describe("FloatingIPAPI", () => {
     });
     test("succeeds with updated labels", async () => {
       mockAxios.get.mockResolvedValueOnce({
-        data: { floating_ip: { ...HFloatingIPMock, labels: "old" } },
+        data: { floating_ip: { ...HFloatingIPMock, labels: { foo: "bar" } } },
       });
       mockAxios.put.mockResolvedValueOnce({
         data: { floating_ip: HFloatingIPMock },
@@ -123,7 +123,7 @@ describe("FloatingIPAPI", () => {
       const res = await sut.updateFloatingIP(1, {
         name: "old",
       });
-      expect(res).toMatchObject({ ...HFloatingIPMock, name: "old" });
+      expect(res).toMatchObject(existingData);
     });
     test("fails without data", async () => {
       const existingData = { ...HFloatingIPMock, name: "old" };

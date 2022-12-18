@@ -13,7 +13,7 @@ export const HFloatingIPMock: HFloatingIP = {
   id: 1,
   ip: "0.0.0.0",
   labels: {},
-  name: "",
+  name: "space-ip",
   protection: {
     delete: false,
   },

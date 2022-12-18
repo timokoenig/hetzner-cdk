@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import chalk from "chalk";
 import client from "./client";
+import { HAction } from "./types/action";
 import {
   FloatingIPCreateRequest,
   FloatingIPCreateResponse,
@@ -30,7 +31,7 @@ export interface IFloatingIPAPI {
   changeProtection(
     id: number,
     params: FloatingIPProtectionRequest
-  ): Promise<FloatingIPProtectionResponse>;
+  ): Promise<HAction>;
 }
 
 export class FloatingIPAPI implements IFloatingIPAPI {
@@ -100,11 +101,11 @@ export class FloatingIPAPI implements IFloatingIPAPI {
   async changeProtection(
     id: number,
     params: FloatingIPProtectionRequest
-  ): Promise<FloatingIPProtectionResponse> {
+  ): Promise<HAction> {
     const res: AxiosResponse<FloatingIPProtectionResponse> = await client.post(
       `/floating_ips/${id}/actions/change_protection`,
       params
     );
-    return res.data;
+    return res.data.action;
   }
 }

@@ -11,7 +11,6 @@ import { Resource, ResourceChangeset } from "./classes/resource";
 import { Server } from "./classes/server";
 import { SSHKey } from "./classes/sshkey";
 import { formatChangesetTableRow, showError } from "./utils/formatter";
-// import packageJSON from ;
 
 const CDK_VERSION = "0.1.0";
 

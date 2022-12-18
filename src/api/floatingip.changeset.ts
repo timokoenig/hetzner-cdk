@@ -3,11 +3,11 @@ import { Operation, ResourceType } from "../cdk/classes/resource";
 import { IFloatingIPAPI } from "./floatingip";
 import { HActionMock } from "./mocks/action";
 import { HFloatingIPMock } from "./mocks/floatingip";
+import { HAction } from "./types/action";
 import {
   FloatingIPCreateRequest,
   FloatingIPGetAllRequest,
   FloatingIPProtectionRequest,
-  FloatingIPProtectionResponse,
   FloatingIPUpdateRequest,
   HFloatingIP,
 } from "./types/floatingip";
@@ -99,7 +99,7 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
   async changeProtection(
     id: number,
     params: FloatingIPProtectionRequest
-  ): Promise<FloatingIPProtectionResponse> {
+  ): Promise<HAction> {
     const currentData = await this._serverApi.getFloatingIP(id);
     if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({
@@ -111,8 +111,6 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
       });
     }
 
-    return {
-      action: HActionMock,
-    };
+    return HActionMock;
   }
 }
