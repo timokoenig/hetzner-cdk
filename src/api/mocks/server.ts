@@ -48,7 +48,7 @@ export const HServerMock: HServer = {
   labels: {},
   load_balancers: undefined,
   locked: false,
-  name: "",
+  name: "space-server",
   outgoing_traffic: null,
   placement_group: undefined,
   primary_disk_size: 1,
