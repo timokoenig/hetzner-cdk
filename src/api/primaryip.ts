@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import chalk from "chalk";
 import client from "./client";
+import { HAction } from "./types/action";
 import {
   HPrimaryIP,
   PrimaryIPCreateRequest,
@@ -19,19 +20,17 @@ import {
 
 export interface IPrimaryIPAPI {
   getAllPrimaryIPs(params?: PrimaryIPGetAllRequest): Promise<HPrimaryIP[]>;
-  createPrimaryIP(
-    params: PrimaryIPCreateRequest
-  ): Promise<PrimaryIPCreateResponse>;
+  createPrimaryIP(params: PrimaryIPCreateRequest): Promise<HPrimaryIP>;
   deletePrimaryIP(id: number): Promise<void>;
-  getPrimaryIP(id: number): Promise<PrimaryIPGetResponse>;
+  getPrimaryIP(id: number): Promise<HPrimaryIP>;
   updatePrimaryIP(
     id: number,
     params: PrimaryIPUpdateRequest
-  ): Promise<PrimaryIPUpdateResponse>;
+  ): Promise<HPrimaryIP>;
   changeProtection(
     id: number,
     params: PrimaryIPProtectionRequest
-  ): Promise<PrimaryIPProtectionResponse>;
+  ): Promise<HAction>;
 }
 
 export class PrimaryIPAPI implements IPrimaryIPAPI {
@@ -48,42 +47,39 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
     return [res.data.primary_ips];
   }
 
-  async createPrimaryIP(
-    params: PrimaryIPCreateRequest
-  ): Promise<PrimaryIPCreateResponse> {
+  async createPrimaryIP(params: PrimaryIPCreateRequest): Promise<HPrimaryIP> {
     const res: AxiosResponse<PrimaryIPCreateResponse> = await client.post(
       "/primary_ips",
       params
     );
-    return res.data;
+    return res.data.primary_ip;
   }
 
   async deletePrimaryIP(id: number): Promise<void> {
     const res = await this.getPrimaryIP(id);
-    if (res.primary_ip.protection.delete) {
+    if (res.protection.delete) {
       // Primary IP is protected
       return;
     }
     return await client.delete(`/primary_ips/${id}`);
   }
 
-  async getPrimaryIP(id: number): Promise<PrimaryIPGetResponse> {
+  async getPrimaryIP(id: number): Promise<HPrimaryIP> {
     const res: AxiosResponse<PrimaryIPGetResponse> = await client.get(
       `/primary_ips/${id}`
     );
-    return res.data;
+    return res.data.primary_ip;
   }
 
   async updatePrimaryIP(
     id: number,
     params: PrimaryIPUpdateRequest
-  ): Promise<PrimaryIPUpdateResponse> {
+  ): Promise<HPrimaryIP> {
     const currentData = await this.getPrimaryIP(id);
     if (
-      (!params.name || currentData.primary_ip.name == params.name) &&
-      (!params.auto_delete ||
-        currentData.primary_ip.auto_delete == params.auto_delete) &&
-      (!params.labels || currentData.primary_ip.labels == params.labels)
+      (!params.name || currentData.name == params.name) &&
+      (!params.auto_delete || currentData.auto_delete == params.auto_delete) &&
+      (!params.labels || currentData.labels == params.labels)
     ) {
       console.log(chalk.gray("[PrimaryIPs] Nothing to update"));
       return currentData;
@@ -93,17 +89,17 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
       `/primary_ips/${id}`,
       params
     );
-    return res.data;
+    return res.data.primary_ip;
   }
 
   async changeProtection(
     id: number,
     params: PrimaryIPProtectionRequest
-  ): Promise<PrimaryIPProtectionResponse> {
+  ): Promise<HAction> {
     const res: AxiosResponse<PrimaryIPProtectionResponse> = await client.post(
       `/primary_ips/${id}/actions/change_protection`,
       params
     );
-    return res.data;
+    return res.data.action;
   }
 }

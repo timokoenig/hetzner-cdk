@@ -46,7 +46,7 @@ export class PrimaryIP implements Resource {
           namespace,
         },
       });
-      return res.primary_ip.id;
+      return res.id;
     } else {
       // PrimaryIP does not exist; create new key
       const res = await apiFactory.primaryip.createPrimaryIP({
@@ -60,13 +60,13 @@ export class PrimaryIP implements Resource {
       if (apiFactory instanceof APIFactory) {
         // Update IP protection
         if (this._options.protected !== undefined) {
-          await apiFactory.primaryip.changeProtection(res.primary_ip.id, {
+          await apiFactory.primaryip.changeProtection(res.id, {
             delete: this._options.protected,
           });
         }
       }
 
-      return res.primary_ip.id;
+      return res.id;
     }
   }
 
