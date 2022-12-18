@@ -30,7 +30,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
   async createPrimaryIP(params: PrimaryIPCreateRequest): Promise<HPrimaryIP> {
     this._cdk.changeset.push({
       operation: Operation.ADD,
-      type: ResourceType.PrimaryIP,
+      type: ResourceType.PRIMARYIP,
       id: params.name,
     });
     return HPrimaryIPMock;
@@ -44,7 +44,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
-      type: ResourceType.PrimaryIP,
+      type: ResourceType.PRIMARYIP,
       id: res.name,
     });
     return true;
@@ -71,7 +71,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     }
     if (params.auto_delete && currentData.auto_delete != params.auto_delete) {
       valueOld.push(`auto_delete: ${currentData.auto_delete}`);
-      valueNew.push(`description: ${params.auto_delete}`);
+      valueNew.push(`auto_delete: ${params.auto_delete}`);
     }
     if (
       params.labels &&
@@ -84,7 +84,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     if (valueOld.length > 0) {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
-        type: ResourceType.PrimaryIP,
+        type: ResourceType.PRIMARYIP,
         id: currentData.name,
         value_old: valueOld.join("\n"),
         value_new: valueNew.join("\n"),
@@ -102,7 +102,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({
         operation: Operation.MODIFY,
-        type: ResourceType.PrimaryIP,
+        type: ResourceType.PRIMARYIP,
         id: currentData.name,
         value_old: `protection: ${currentData.protection.delete}`,
         value_new: `protection: ${params.delete}`,

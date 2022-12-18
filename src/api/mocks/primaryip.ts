@@ -1,6 +1,6 @@
+import { HIPType } from "../types/floatingip";
 import { HAssigneeType, HPrimaryIP } from "../types/primaryip";
 import { HDatacenterMock } from "./datacenter";
-import { HIPType } from "../types/floatingip";
 
 export const HPrimaryIPMock: HPrimaryIP = {
   assignee_ip: null,
@@ -13,7 +13,7 @@ export const HPrimaryIPMock: HPrimaryIP = {
   id: 1,
   ip: "0.0.0.0",
   labels: {},
-  name: "",
+  name: "space-ip",
   protection: {
     delete: false,
   },
