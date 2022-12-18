@@ -36,17 +36,18 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     return HPrimaryIPMock;
   }
 
-  async deletePrimaryIP(id: number): Promise<void> {
+  async deletePrimaryIP(id: number): Promise<boolean> {
     const res = await this._serverApi.getPrimaryIP(id);
     if (res.protection.delete) {
       // Primary IP is protected
-      return;
+      return false;
     }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.PrimaryIP,
       id: res.name,
     });
+    return true;
   }
 
   async getPrimaryIP(id: number): Promise<HPrimaryIP> {

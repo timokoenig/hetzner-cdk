@@ -23,8 +23,8 @@ export class PrimaryIPAPIMock implements IPrimaryIPAPI {
     return this.createPrimaryIPResult;
   }
 
-  deletePrimaryIPResult: Promise<void> = Promise.resolve();
-  async deletePrimaryIP(id: number): Promise<void> {
+  deletePrimaryIPResult: boolean = true;
+  async deletePrimaryIP(id: number): Promise<boolean> {
     return this.deletePrimaryIPResult;
   }
 

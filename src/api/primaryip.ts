@@ -21,7 +21,7 @@ import {
 export interface IPrimaryIPAPI {
   getAllPrimaryIPs(params?: PrimaryIPGetAllRequest): Promise<HPrimaryIP[]>;
   createPrimaryIP(params: PrimaryIPCreateRequest): Promise<HPrimaryIP>;
-  deletePrimaryIP(id: number): Promise<void>;
+  deletePrimaryIP(id: number): Promise<boolean>;
   getPrimaryIP(id: number): Promise<HPrimaryIP>;
   updatePrimaryIP(
     id: number,
@@ -55,13 +55,14 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
     return res.data.primary_ip;
   }
 
-  async deletePrimaryIP(id: number): Promise<void> {
+  async deletePrimaryIP(id: number): Promise<boolean> {
     const res = await this.getPrimaryIP(id);
     if (res.protection.delete) {
       // Primary IP is protected
-      return;
+      return false;
     }
-    return await client.delete(`/primary_ips/${id}`);
+    await client.delete(`/primary_ips/${id}`);
+    return true;
   }
 
   async getPrimaryIP(id: number): Promise<HPrimaryIP> {

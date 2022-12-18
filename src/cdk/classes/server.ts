@@ -67,8 +67,7 @@ export class Server implements Resource {
     const primaryIPs = await Promise.all(
       this._primaryIPs.map(async (obj) => {
         const primaryIPId = await obj.apply(apiFactory);
-        const res = await apiFactory.primaryip.getPrimaryIP(primaryIPId);
-        return res.primary_ip;
+        return await apiFactory.primaryip.getPrimaryIP(primaryIPId);
       })
     );
 
