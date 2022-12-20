@@ -10,7 +10,7 @@ export const HPrimaryIPMock: HPrimaryIP = {
   created: "",
   datacenter: HDatacenterMock,
   dns_ptr: [],
-  id: 1,
+  id: 0,
   ip: "0.0.0.0",
   labels: {},
   name: "space-ip",

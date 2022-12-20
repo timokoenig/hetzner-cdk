@@ -10,7 +10,7 @@ export const HFloatingIPMock: HFloatingIP = {
     dns_ptr: "",
   },
   home_location: HLocationMock,
-  id: 1,
+  id: 0,
   ip: "0.0.0.0",
   labels: {},
   name: "space-ip",
