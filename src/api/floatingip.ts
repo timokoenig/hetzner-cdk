@@ -22,7 +22,7 @@ import {
 export interface IFloatingIPAPI {
   getAllFloatingIPs(params?: FloatingIPGetAllRequest): Promise<HFloatingIP[]>;
   createFloatingIP(params: FloatingIPCreateRequest): Promise<HFloatingIP>;
-  deleteFloatingIP(id: number): Promise<HFloatingIP | null>;
+  deleteFloatingIP(id: number): Promise<boolean>;
   getFloatingIP(id: number): Promise<HFloatingIP>;
   updateFloatingIP(
     id: number,
@@ -58,16 +58,16 @@ export class FloatingIPAPI implements IFloatingIPAPI {
     return res.data.floating_ip;
   }
 
-  async deleteFloatingIP(id: number): Promise<HFloatingIP | null> {
+  async deleteFloatingIP(id: number): Promise<boolean> {
     const obj = await this.getFloatingIP(id);
     if (obj.protection.delete) {
       // Floating IP is protected
-      return null;
+      return false;
     }
     const res: AxiosResponse<FloatingIPDeleteResponse> = await client.delete(
       `/floating_ips/${id}`
     );
-    return res.data.floating_ip;
+    return true;
   }
 
   async getFloatingIP(id: number): Promise<HFloatingIP> {

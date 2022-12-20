@@ -169,7 +169,7 @@ export class CDK implements ICDK {
   // Generate changeset for deployment
   private async _generateChangesetDeployment(): Promise<boolean> {
     // Use APIFactoryChangeset to mock all create/update/delete functions and create changeset entries
-    const apiFactoryChangeset = new APIFactoryChangeset(this);
+    const apiFactoryChangeset = new APIFactoryChangeset(this, new APIFactory());
     await Promise.all(
       this._resources.map((obj) => obj.apply(apiFactoryChangeset))
     );
@@ -199,7 +199,7 @@ export class CDK implements ICDK {
     localResources: Resource[]
   ): Promise<boolean> {
     // Use APIFactoryChangeset to mock all create/update/delete functions and create changeset entries
-    const apiFactoryChangeset = new APIFactoryChangeset(this);
+    const apiFactoryChangeset = new APIFactoryChangeset(this, new APIFactory());
     await Promise.all(
       localResources.map((obj) => obj.delete(apiFactoryChangeset))
     );

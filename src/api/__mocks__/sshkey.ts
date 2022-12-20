@@ -18,7 +18,7 @@ export class SSHKeyAPIMock implements ISSHKeyAPI {
     return this.createSSHKeyResult;
   }
 
-  deleteSSHKeyResult: boolean = true;
+  deleteSSHKeyResult: Promise<boolean> = Promise.resolve(true);
   async deleteSSHKey(id: number): Promise<boolean> {
     return this.deleteSSHKeyResult;
   }

@@ -68,7 +68,7 @@ export class FloatingIP implements Resource {
     }
   }
 
-  async delete(apiFactory: IAPIFactory): Promise<void> {
+  async delete(apiFactory: IAPIFactory): Promise<boolean> {
     const namespace = this.cdk?.namespace ?? "";
     const allFloatingIPs = await apiFactory.floatingip.getAllFloatingIPs({
       label_selector: `namespace=${namespace}`,
@@ -76,20 +76,20 @@ export class FloatingIP implements Resource {
     const floatingIP = allFloatingIPs.find((obj) => obj.name == this.getName());
     if (!floatingIP) {
       console.log(chalk.red("[FloatingIP] IP does not exist; skip deletion"));
-      return;
+      return false;
     }
     if (floatingIP.protection.delete) {
       console.log(chalk.yellow("[FloatingIP] IP is protected; skip deletion"));
-      return;
+      return false;
     }
-    await apiFactory.floatingip.deleteFloatingIP(floatingIP.id);
+    return await apiFactory.floatingip.deleteFloatingIP(floatingIP.id);
   }
 
   static async deleteUnusedResources(
     localResourceNames: string[],
     namespace: string,
     apiFactory: IAPIFactory
-  ): Promise<void> {
+  ): Promise<boolean> {
     const remoteResources = await apiFactory.floatingip.getAllFloatingIPs({
       label_selector: `namespace=${namespace}`,
     });
@@ -99,10 +99,12 @@ export class FloatingIP implements Resource {
           (name) => name == floatingIP.name && !floatingIP.protection.delete
         ) == -1
     );
-    await Promise.all(
+    if (resourcesToBeRemoved.length == 0) return false;
+    const res = await Promise.all(
       resourcesToBeRemoved.map((obj) =>
         apiFactory.floatingip.deleteFloatingIP(obj.id)
       )
     );
+    return res.findIndex((obj) => obj === false)! != 1;
   }
 }

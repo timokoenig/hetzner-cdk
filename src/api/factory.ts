@@ -23,11 +23,11 @@ export class APIFactory implements IAPIFactory {
 }
 
 export class APIFactoryChangeset implements IAPIFactory {
-  constructor(cdk: ICDK) {
-    this.server = new ServerAPIChangeset(cdk, new ServerAPI());
-    this.sshkey = new SSHKeyAPIChangeset(cdk, new SSHKeyAPI());
-    this.floatingip = new FloatingIPAPIChangeset(cdk, new FloatingIPAPI());
-    this.primaryip = new PrimaryIPAPIChangeset(cdk, new PrimaryIPAPI());
+  constructor(cdk: ICDK, apiFactory: IAPIFactory) {
+    this.server = new ServerAPIChangeset(cdk, apiFactory.server);
+    this.sshkey = new SSHKeyAPIChangeset(cdk, apiFactory.sshkey);
+    this.floatingip = new FloatingIPAPIChangeset(cdk, apiFactory.floatingip);
+    this.primaryip = new PrimaryIPAPIChangeset(cdk, apiFactory.primaryip);
   }
 
   server: IServerAPI;

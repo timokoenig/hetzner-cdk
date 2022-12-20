@@ -154,7 +154,7 @@ export class Server implements Resource {
     }
   }
 
-  async delete(apiFactory: IAPIFactory): Promise<void> {
+  async delete(apiFactory: IAPIFactory): Promise<boolean> {
     const namespace = this.cdk?.namespace ?? "";
     const allServers = await apiFactory.server.getAllServers({
       label_selector: `namespace=${namespace}`,
@@ -162,13 +162,14 @@ export class Server implements Resource {
     const server = allServers.find((obj) => obj.name == this.getName());
     if (!server) {
       console.log(chalk.red("[Server] Server does not exist; skip deletion"));
-      return;
+      return false;
     }
     if (server.protection.delete) {
       console.log(chalk.yellow("[Server] Server is protected; skip deletion"));
-      return;
+      return false;
     }
-    await apiFactory.server.deleteServer(server.id);
+    const res = await apiFactory.server.deleteServer(server.id);
+    if (!res) return false;
 
     // Wait until server has been deleted
     if (apiFactory instanceof APIFactory) {
@@ -176,13 +177,14 @@ export class Server implements Resource {
       await this._waitForServerToBeDeleted(apiFactory, server.id, createdAt);
       console.log(chalk.gray(`Server ${server.name} has been deleted`));
     }
+    return true;
   }
 
   static async deleteUnusedResources(
     localResourceNames: string[],
     namespace: string,
     apiFactory: IAPIFactory
-  ): Promise<void> {
+  ): Promise<boolean> {
     const remoteResources = await apiFactory.server.getAllServers({
       label_selector: `namespace=${namespace}`,
     });
@@ -192,8 +194,10 @@ export class Server implements Resource {
           (name) => name == server.name && !server.protection.delete
         ) == -1
     );
-    await Promise.all(
+    if (resourcesToBeRemoved.length == 0) return false;
+    const res = await Promise.all(
       resourcesToBeRemoved.map((obj) => apiFactory.server.deleteServer(obj.id))
     );
+    return res.findIndex((obj) => obj === false)! != 1;
   }
 }

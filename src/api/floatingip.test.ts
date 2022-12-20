@@ -49,7 +49,7 @@ describe("FloatingIPAPI", () => {
         data: { floating_ip: HFloatingIPMock },
       });
       const res = await sut.deleteFloatingIP(1);
-      expect(res).toMatchObject(HFloatingIPMock);
+      expect(res).toBeTruthy();
     });
 
     test("fails with protection", async () => {
@@ -62,7 +62,7 @@ describe("FloatingIPAPI", () => {
         data: { floating_ip: HFloatingIPMock },
       });
       const res = await sut.deleteFloatingIP(1);
-      expect(res).toBeNull();
+      expect(res).toBeFalsy();
     });
   });
 

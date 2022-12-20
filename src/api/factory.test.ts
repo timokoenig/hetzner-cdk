@@ -21,7 +21,7 @@ describe("APIFactory", () => {
 
 describe("APIFactoryChangeset", () => {
   test("succeeds", async () => {
-    const sut = new APIFactoryChangeset(new CDKMock());
+    const sut = new APIFactoryChangeset(new CDKMock(), new APIFactory());
     expect(sut.server).toBeInstanceOf(ServerAPIChangeset);
     expect(sut.sshkey).toBeInstanceOf(SSHKeyAPIChangeset);
     expect(sut.floatingip).toBeInstanceOf(FloatingIPAPIChangeset);

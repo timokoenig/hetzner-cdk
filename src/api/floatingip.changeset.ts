@@ -38,18 +38,18 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     return HFloatingIPMock;
   }
 
-  async deleteFloatingIP(id: number): Promise<HFloatingIP | null> {
+  async deleteFloatingIP(id: number): Promise<boolean> {
     const res = await this._serverApi.getFloatingIP(id);
     if (res.protection.delete) {
       // Floating IP is protected
-      return null;
+      return false;
     }
     this._cdk.changeset.push({
       operation: Operation.DELETE,
       type: ResourceType.FLOATINGIP,
       id: res.name,
     });
-    return HFloatingIPMock;
+    return true;
   }
 
   async getFloatingIP(id: number): Promise<HFloatingIP> {

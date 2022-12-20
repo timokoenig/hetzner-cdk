@@ -26,9 +26,8 @@ export class FloatingIPAPIMock implements IFloatingIPAPI {
     return this.createFloatingIPResult;
   }
 
-  deleteFloatingIPResult: Promise<HFloatingIP | null> =
-    Promise.resolve(HFloatingIPMock);
-  async deleteFloatingIP(id: number): Promise<HFloatingIP | null> {
+  deleteFloatingIPResult: Promise<boolean> = Promise.resolve(true);
+  async deleteFloatingIP(id: number): Promise<boolean> {
     return this.deleteFloatingIPResult;
   }
 

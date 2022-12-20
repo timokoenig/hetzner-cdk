@@ -70,7 +70,7 @@ export class PrimaryIP implements Resource {
     }
   }
 
-  async delete(apiFactory: IAPIFactory): Promise<void> {
+  async delete(apiFactory: IAPIFactory): Promise<boolean> {
     const namespace = this.cdk?.namespace ?? "";
     const allPrimaryIPs = await apiFactory.primaryip.getAllPrimaryIPs({
       label_selector: `namespace=${namespace}`,
@@ -78,20 +78,20 @@ export class PrimaryIP implements Resource {
     const primaryIP = allPrimaryIPs.find((obj) => obj.name == this.getName());
     if (!primaryIP) {
       console.log(chalk.red("[PrimaryIP] IP does not exist; skip deletion"));
-      return;
+      return false;
     }
     if (primaryIP.protection.delete) {
       console.log(chalk.yellow("[PrimaryIP] IP is protected; skip deletion"));
-      return;
+      return false;
     }
-    await apiFactory.primaryip.deletePrimaryIP(primaryIP.id);
+    return await apiFactory.primaryip.deletePrimaryIP(primaryIP.id);
   }
 
   static async deleteUnusedResources(
     localResourceNames: string[],
     namespace: string,
     apiFactory: IAPIFactory
-  ): Promise<void> {
+  ): Promise<boolean> {
     const remoteResources = await apiFactory.primaryip.getAllPrimaryIPs({
       label_selector: `namespace=${namespace}`,
     });
@@ -101,10 +101,12 @@ export class PrimaryIP implements Resource {
           (name) => name == primaryIP.name && !primaryIP.protection.delete
         ) == -1
     );
-    await Promise.all(
+    if (resourcesToBeRemoved.length == 0) return false;
+    const res = await Promise.all(
       resourcesToBeRemoved.map((obj) =>
         apiFactory.primaryip.deletePrimaryIP(obj.id)
       )
     );
+    return res.findIndex((obj) => obj === false)! != 1;
   }
 }

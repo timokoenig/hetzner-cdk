@@ -47,7 +47,7 @@ describe("FloatingIPAPIChangeset", () => {
   describe("deleteFloatingIP", () => {
     test("succeeds", async () => {
       const res = await sut.deleteFloatingIP(1);
-      expect(res).toMatchObject(HFloatingIPMock);
+      expect(res).toBeTruthy();
       expect(cdk.changeset.length).toBe(1);
       expect(cdk.changeset[0]).toMatchObject({
         operation: Operation.DELETE,
@@ -62,7 +62,7 @@ describe("FloatingIPAPIChangeset", () => {
         protection: { delete: true },
       });
       const res = await sut.deleteFloatingIP(1);
-      expect(res).toBeNull();
+      expect(res).toBeFalsy();
       expect(cdk.changeset.length).toBe(0);
     });
   });
