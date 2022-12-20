@@ -1,6 +1,6 @@
-import mockAxios from "../__mocks__/axios";
+import mockAxios from "../../__mocks__/axios";
+import { HDatacenterMock } from "../types/__mocks__/datacenter-mock";
 import { getAllDatacenters } from "./datacenter";
-import { HDatacenterMock } from "./mocks/datacenter";
 
 describe("Datacenter", () => {
   describe("getAllDatacenters", () => {

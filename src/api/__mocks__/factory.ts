@@ -1,8 +1,8 @@
 import { IAPIFactory } from "../factory";
-import { IFloatingIPAPI } from "../floatingip";
-import { IPrimaryIPAPI } from "../primaryip";
-import { IServerAPI } from "../server";
-import { ISSHKeyAPI } from "../sshkey";
+import { IFloatingIPAPI } from "../floatingip/floatingip";
+import { IPrimaryIPAPI } from "../primaryip/primaryip";
+import { IServerAPI } from "../server/server";
+import { ISSHKeyAPI } from "../sshkey/sshkey";
 import { FloatingIPAPIMock } from "./floatingip";
 import { PrimaryIPAPIMock } from "./primaryip";
 import { ServerAPIMock } from "./server";

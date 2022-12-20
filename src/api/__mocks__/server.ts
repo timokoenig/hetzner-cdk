@@ -1,6 +1,4 @@
-import { HActionMock } from "../mocks/action";
-import { HServerMock } from "../mocks/server";
-import { IServerAPI } from "../server";
+import { IServerAPI } from "../server/server";
 import { HAction } from "../types/action";
 import {
   HServer,
@@ -9,6 +7,8 @@ import {
   ServerProtectionRequest,
   ServerUpdateRequest,
 } from "../types/server";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HServerMock } from "../types/__mocks__/server-mock";
 
 export class ServerAPIMock implements IServerAPI {
   getAllServersResult: Promise<HServer[]> = Promise.resolve([]);

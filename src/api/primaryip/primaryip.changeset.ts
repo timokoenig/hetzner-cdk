@@ -1,16 +1,16 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { HActionMock } from "./mocks/action";
-import { HPrimaryIPMock } from "./mocks/primaryip";
-import { IPrimaryIPAPI } from "./primaryip";
-import { HAction } from "./types/action";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { HAction } from "../types/action";
 import {
   HPrimaryIP,
   PrimaryIPCreateRequest,
   PrimaryIPGetAllRequest,
   PrimaryIPProtectionRequest,
   PrimaryIPUpdateRequest,
-} from "./types/primaryip";
+} from "../types/primaryip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HPrimaryIPMock } from "../types/__mocks__/primaryip-mock";
+import { IPrimaryIPAPI } from "./primaryip";
 
 export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
   private _cdk: ICDK;

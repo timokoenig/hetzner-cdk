@@ -1,4 +1,4 @@
-import { HAction, HActionStatus } from "../types/action";
+import { HAction, HActionStatus } from "../action";
 
 export const HActionMock: HAction = {
   command: "create",

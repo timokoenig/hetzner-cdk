@@ -1,8 +1,8 @@
-import mockAxios from "../__mocks__/axios";
+import mockAxios from "../../__mocks__/axios";
+import { HIPType } from "../types/floatingip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HFloatingIPMock } from "../types/__mocks__/floatingip-mock";
 import { FloatingIPAPI } from "./floatingip";
-import { HActionMock } from "./mocks/action";
-import { HFloatingIPMock } from "./mocks/floatingip";
-import { HIPType } from "./types/floatingip";
 
 describe("FloatingIPAPI", () => {
   let sut = new FloatingIPAPI();

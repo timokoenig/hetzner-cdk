@@ -1,11 +1,11 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { CDKMock } from "../cdk/__mocks__/cdk";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { CDKMock } from "../../cdk/__mocks__/cdk";
+import { HIPType } from "../types/floatingip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HFloatingIPMock } from "../types/__mocks__/floatingip-mock";
+import { FloatingIPAPIMock } from "../__mocks__/floatingip";
 import { FloatingIPAPIChangeset } from "./floatingip.changeset";
-import { HActionMock } from "./mocks/action";
-import { HFloatingIPMock } from "./mocks/floatingip";
-import { HIPType } from "./types/floatingip";
-import { FloatingIPAPIMock } from "./__mocks__/floatingip";
 
 describe("FloatingIPAPIChangeset", () => {
   let cdk: ICDK;

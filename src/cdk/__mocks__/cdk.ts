@@ -1,5 +1,5 @@
-import { HDatacenterMock } from "../../api/mocks/datacenter";
 import { HDatacenter } from "../../api/types/datacenter";
+import { HDatacenterMock } from "../../api/types/__mocks__/datacenter-mock";
 import { CDKMode, ICDK } from "../cdk";
 import { Resource, ResourceChangeset } from "../classes/resource";
 

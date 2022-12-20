@@ -1,6 +1,4 @@
-import { IFloatingIPAPI } from "../floatingip";
-import { HActionMock } from "../mocks/action";
-import { HFloatingIPMock } from "../mocks/floatingip";
+import { IFloatingIPAPI } from "../floatingip/floatingip";
 import { HAction } from "../types/action";
 import {
   FloatingIPCreateRequest,
@@ -9,6 +7,8 @@ import {
   FloatingIPUpdateRequest,
   HFloatingIP,
 } from "../types/floatingip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HFloatingIPMock } from "../types/__mocks__/floatingip-mock";
 
 export class FloatingIPAPIMock implements IFloatingIPAPI {
   getAllFloatingIPsResult: Promise<HFloatingIP[]> = Promise.resolve([]);

@@ -1,16 +1,16 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { HActionMock } from "./mocks/action";
-import { HServerMock } from "./mocks/server";
-import { IServerAPI } from "./server";
-import { HAction } from "./types/action";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { HAction } from "../types/action";
 import {
   HServer,
   ServerCreateRequest,
   ServerGetAllRequest,
   ServerProtectionRequest,
   ServerUpdateRequest,
-} from "./types/server";
+} from "../types/server";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HServerMock } from "../types/__mocks__/server-mock";
+import { IServerAPI } from "./server";
 
 export class ServerAPIChangeset implements IServerAPI {
   private _cdk: ICDK;

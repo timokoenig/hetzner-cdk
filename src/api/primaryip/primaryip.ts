@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import chalk from "chalk";
-import client from "./client";
-import { HAction } from "./types/action";
+import client from "../client";
+import { HAction } from "../types/action";
 import {
   HPrimaryIP,
   PrimaryIPCreateRequest,
@@ -13,7 +13,7 @@ import {
   PrimaryIPProtectionResponse,
   PrimaryIPUpdateRequest,
   PrimaryIPUpdateResponse,
-} from "./types/primaryip";
+} from "../types/primaryip";
 
 // Cloud API - Primary IP
 // https://docs.hetzner.cloud/#primary-ips

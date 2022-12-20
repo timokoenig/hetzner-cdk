@@ -1,16 +1,16 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { IFloatingIPAPI } from "./floatingip";
-import { HActionMock } from "./mocks/action";
-import { HFloatingIPMock } from "./mocks/floatingip";
-import { HAction } from "./types/action";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { HAction } from "../types/action";
 import {
   FloatingIPCreateRequest,
   FloatingIPGetAllRequest,
   FloatingIPProtectionRequest,
   FloatingIPUpdateRequest,
   HFloatingIP,
-} from "./types/floatingip";
+} from "../types/floatingip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HFloatingIPMock } from "../types/__mocks__/floatingip-mock";
+import { IFloatingIPAPI } from "./floatingip";
 
 export class FloatingIPAPIChangeset implements IFloatingIPAPI {
   private _cdk: ICDK;

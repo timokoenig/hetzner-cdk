@@ -1,9 +1,9 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { CDKMock } from "../cdk/__mocks__/cdk";
-import { HSSHKeyMock } from "./mocks/sshkey";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { CDKMock } from "../../cdk/__mocks__/cdk";
+import { HSSHKeyMock } from "../types/__mocks__/sshkey-mock";
+import { SSHKeyAPIMock } from "../__mocks__/sshkey";
 import { SSHKeyAPIChangeset } from "./sshkey.changeset";
-import { SSHKeyAPIMock } from "./__mocks__/sshkey";
 
 describe("SSHKeyAPIChangeset", () => {
   let cdk: ICDK;

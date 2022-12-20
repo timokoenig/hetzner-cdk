@@ -1,11 +1,11 @@
-import { HSSHKeyMock } from "../mocks/sshkey";
-import { ISSHKeyAPI } from "../sshkey";
+import { ISSHKeyAPI } from "../sshkey/sshkey";
 import {
   HSSHKey,
   SSHKeyCreateRequest,
   SSHKeyGetAllRequest,
   SSHKeyUpdateRequest,
 } from "../types/sshkey";
+import { HSSHKeyMock } from "../types/__mocks__/sshkey-mock";
 
 export class SSHKeyAPIMock implements ISSHKeyAPI {
   getAllSSHKeysResult: Promise<HSSHKey[]> = Promise.resolve([]);

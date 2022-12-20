@@ -1,5 +1,5 @@
-import { HDatacenter } from "../types/datacenter";
-import { HLocationMock } from "./location";
+import { HDatacenter } from "../datacenter";
+import { HLocationMock } from "./location-mock";
 
 export const HDatacenterMock: HDatacenter = {
   description: "",

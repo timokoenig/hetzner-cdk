@@ -1,9 +1,9 @@
 import { AxiosResponse } from "axios";
-import client from "./client";
+import client from "../client";
 import {
   DatacenterGetAllRequest,
   DatacenterGetAllResponse,
-} from "./types/datacenter";
+} from "../types/datacenter";
 
 // Cloud API - Datacenters
 // https://docs.hetzner.cloud/#datacenters

@@ -1,5 +1,5 @@
-import { HFloatingIP, HIPType } from "../types/floatingip";
-import { HLocationMock } from "./location";
+import { HFloatingIP, HIPType } from "../floatingip";
+import { HLocationMock } from "./location-mock";
 
 export const HFloatingIPMock: HFloatingIP = {
   blocked: false,

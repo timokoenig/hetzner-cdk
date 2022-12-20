@@ -1,4 +1,4 @@
-import { HServerMock } from "../../api/mocks/server";
+import { HServerMock } from "../../api/types/__mocks__/server-mock";
 import { APIFactoryMock } from "../../api/__mocks__/factory";
 import { ServerAPIMock } from "../../api/__mocks__/server";
 import { CDKMock } from "../__mocks__/cdk";

@@ -1,9 +1,9 @@
-import mockAxios from "../__mocks__/axios";
-import { HActionMock } from "./mocks/action";
-import { HPrimaryIPMock } from "./mocks/primaryip";
+import mockAxios from "../../__mocks__/axios";
+import { HIPType } from "../types/floatingip";
+import { HAssigneeType } from "../types/primaryip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HPrimaryIPMock } from "../types/__mocks__/primaryip-mock";
 import { PrimaryIPAPI } from "./primaryip";
-import { HIPType } from "./types/floatingip";
-import { HAssigneeType } from "./types/primaryip";
 
 describe("PrimaryIPAPI", () => {
   let sut = new PrimaryIPAPI();

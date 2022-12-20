@@ -1,6 +1,4 @@
-import { HActionMock } from "../mocks/action";
-import { HPrimaryIPMock } from "../mocks/primaryip";
-import { IPrimaryIPAPI } from "../primaryip";
+import { IPrimaryIPAPI } from "../primaryip/primaryip";
 import { HAction } from "../types/action";
 import {
   HPrimaryIP,
@@ -9,6 +7,8 @@ import {
   PrimaryIPProtectionRequest,
   PrimaryIPUpdateRequest,
 } from "../types/primaryip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HPrimaryIPMock } from "../types/__mocks__/primaryip-mock";
 
 export class PrimaryIPAPIMock implements IPrimaryIPAPI {
   getAllPrimaryIPsResult: Promise<HPrimaryIP[]> = Promise.resolve([]);

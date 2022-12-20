@@ -1,10 +1,10 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { CDKMock } from "../cdk/__mocks__/cdk";
-import { HActionMock } from "./mocks/action";
-import { HServerMock } from "./mocks/server";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { CDKMock } from "../../cdk/__mocks__/cdk";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HServerMock } from "../types/__mocks__/server-mock";
+import { ServerAPIMock } from "../__mocks__/server";
 import { ServerAPIChangeset } from "./server.changeset";
-import { ServerAPIMock } from "./__mocks__/server";
 
 describe("ServerAPIChangeset", () => {
   let cdk: ICDK;

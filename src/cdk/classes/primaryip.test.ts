@@ -1,4 +1,4 @@
-import { HPrimaryIPMock } from "../../api/mocks/primaryip";
+import { HPrimaryIPMock } from "../../api/types/__mocks__/primaryip-mock";
 import { APIFactoryMock } from "../../api/__mocks__/factory";
 import { PrimaryIPAPIMock } from "../../api/__mocks__/primaryip";
 import { CDKMock } from "../__mocks__/cdk";

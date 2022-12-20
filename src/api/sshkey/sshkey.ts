@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import chalk from "chalk";
-import client from "./client";
+import client from "../client";
 import {
   HSSHKey,
   SSHKeyCreateRequest,
@@ -10,7 +10,7 @@ import {
   SSHKeyGetResponse,
   SSHKeyUpdateRequest,
   SSHKeyUpdateResponse,
-} from "./types/sshkey";
+} from "../types/sshkey";
 
 // Cloud API - SSH Keys
 // https://docs.hetzner.cloud/#ssh-keys

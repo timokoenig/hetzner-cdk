@@ -1,13 +1,13 @@
 import { CDKMock } from "../cdk/__mocks__/cdk";
 import { APIFactory, APIFactoryChangeset } from "./factory";
-import { FloatingIPAPI } from "./floatingip";
-import { FloatingIPAPIChangeset } from "./floatingip.changeset";
-import { PrimaryIPAPI } from "./primaryip";
-import { PrimaryIPAPIChangeset } from "./primaryip.changeset";
-import { ServerAPI } from "./server";
-import { ServerAPIChangeset } from "./server.changeset";
-import { SSHKeyAPI } from "./sshkey";
-import { SSHKeyAPIChangeset } from "./sshkey.changeset";
+import { FloatingIPAPI } from "./floatingip/floatingip";
+import { FloatingIPAPIChangeset } from "./floatingip/floatingip.changeset";
+import { PrimaryIPAPI } from "./primaryip/primaryip";
+import { PrimaryIPAPIChangeset } from "./primaryip/primaryip.changeset";
+import { ServerAPI } from "./server/server";
+import { ServerAPIChangeset } from "./server/server.changeset";
+import { SSHKeyAPI } from "./sshkey/sshkey";
+import { SSHKeyAPIChangeset } from "./sshkey/sshkey.changeset";
 
 describe("APIFactory", () => {
   test("succeeds", async () => {

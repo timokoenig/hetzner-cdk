@@ -1,5 +1,5 @@
-import mockAxios from "../__mocks__/axios";
-import { HSSHKeyMock } from "./mocks/sshkey";
+import mockAxios from "../../__mocks__/axios";
+import { HSSHKeyMock } from "../types/__mocks__/sshkey-mock";
 import { SSHKeyAPI } from "./sshkey";
 
 describe("SSHKeyAPI", () => {

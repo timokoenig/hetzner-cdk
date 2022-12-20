@@ -1,4 +1,4 @@
-import { HSSHKeyMock } from "../../api/mocks/sshkey";
+import { HSSHKeyMock } from "../../api/types/__mocks__/sshkey-mock";
 import { APIFactoryMock } from "../../api/__mocks__/factory";
 import { SSHKeyAPIMock } from "../../api/__mocks__/sshkey";
 import { CDKMock } from "../__mocks__/cdk";

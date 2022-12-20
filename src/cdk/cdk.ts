@@ -2,7 +2,7 @@ import chalk from "chalk";
 import Table from "cli-table";
 import { program } from "commander";
 import yesno from "yesno";
-import { getAllDatacenters } from "../api/datacenter";
+import { getAllDatacenters } from "../api/datacenter/datacenter";
 import { APIFactory, APIFactoryChangeset, IAPIFactory } from "../api/factory";
 import { DATACENTER, HDatacenter } from "../api/types/datacenter";
 import { FloatingIP } from "./classes/floatingip";

@@ -1,6 +1,6 @@
-import mockAxios from "../__mocks__/axios";
-import { HActionMock } from "./mocks/action";
-import { HServerMock } from "./mocks/server";
+import mockAxios from "../../__mocks__/axios";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HServerMock } from "../types/__mocks__/server-mock";
 import { ServerAPI } from "./server";
 
 describe("ServerAPI", () => {

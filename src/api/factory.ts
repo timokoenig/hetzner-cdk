@@ -1,12 +1,12 @@
 import { ICDK } from "../cdk/cdk";
-import { FloatingIPAPI, IFloatingIPAPI } from "./floatingip";
-import { FloatingIPAPIChangeset } from "./floatingip.changeset";
-import { IPrimaryIPAPI, PrimaryIPAPI } from "./primaryip";
-import { PrimaryIPAPIChangeset } from "./primaryip.changeset";
-import { IServerAPI, ServerAPI } from "./server";
-import { ServerAPIChangeset } from "./server.changeset";
-import { ISSHKeyAPI, SSHKeyAPI } from "./sshkey";
-import { SSHKeyAPIChangeset } from "./sshkey.changeset";
+import { FloatingIPAPI, IFloatingIPAPI } from "./floatingip/floatingip";
+import { FloatingIPAPIChangeset } from "./floatingip/floatingip.changeset";
+import { IPrimaryIPAPI, PrimaryIPAPI } from "./primaryip/primaryip";
+import { PrimaryIPAPIChangeset } from "./primaryip/primaryip.changeset";
+import { IServerAPI, ServerAPI } from "./server/server";
+import { ServerAPIChangeset } from "./server/server.changeset";
+import { ISSHKeyAPI, SSHKeyAPI } from "./sshkey/sshkey";
+import { SSHKeyAPIChangeset } from "./sshkey/sshkey.changeset";
 
 export interface IAPIFactory {
   server: IServerAPI;

@@ -1,4 +1,4 @@
-import { HLocation } from "../types/location";
+import { HLocation } from "../location";
 
 export const HLocationMock: HLocation = {
   id: 0,

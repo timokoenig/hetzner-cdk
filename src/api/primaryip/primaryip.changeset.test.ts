@@ -1,12 +1,12 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { CDKMock } from "../cdk/__mocks__/cdk";
-import { HActionMock } from "./mocks/action";
-import { HPrimaryIPMock } from "./mocks/primaryip";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { CDKMock } from "../../cdk/__mocks__/cdk";
+import { HIPType } from "../types/floatingip";
+import { HAssigneeType } from "../types/primaryip";
+import { HActionMock } from "../types/__mocks__/action-mock";
+import { HPrimaryIPMock } from "../types/__mocks__/primaryip-mock";
+import { PrimaryIPAPIMock } from "../__mocks__/primaryip";
 import { PrimaryIPAPIChangeset } from "./primaryip.changeset";
-import { HIPType } from "./types/floatingip";
-import { HAssigneeType } from "./types/primaryip";
-import { PrimaryIPAPIMock } from "./__mocks__/primaryip";
 
 describe("PrimaryIPAPIChangeset", () => {
   let cdk: ICDK;

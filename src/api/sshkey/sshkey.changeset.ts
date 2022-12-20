@@ -1,13 +1,13 @@
-import { ICDK } from "../cdk/cdk";
-import { Operation, ResourceType } from "../cdk/classes/resource";
-import { HSSHKeyMock } from "./mocks/sshkey";
-import { ISSHKeyAPI } from "./sshkey";
+import { ICDK } from "../../cdk/cdk";
+import { Operation, ResourceType } from "../../cdk/classes/resource";
 import {
   HSSHKey,
   SSHKeyCreateRequest,
   SSHKeyGetAllRequest,
   SSHKeyUpdateRequest,
-} from "./types/sshkey";
+} from "../types/sshkey";
+import { HSSHKeyMock } from "../types/__mocks__/sshkey-mock";
+import { ISSHKeyAPI } from "./sshkey";
 
 export class SSHKeyAPIChangeset implements ISSHKeyAPI {
   private _cdk: ICDK;

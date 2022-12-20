@@ -1,4 +1,4 @@
-import { HFloatingIPMock } from "../../api/mocks/floatingip";
+import { HFloatingIPMock } from "../../api/types/__mocks__/floatingip-mock";
 import { APIFactoryMock } from "../../api/__mocks__/factory";
 import { FloatingIPAPIMock } from "../../api/__mocks__/floatingip";
 import { CDKMock } from "../__mocks__/cdk";
