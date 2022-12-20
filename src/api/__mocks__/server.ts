@@ -21,7 +21,7 @@ export class ServerAPIMock implements IServerAPI {
     return this.createServerResult;
   }
 
-  deleteServerResult: boolean = true;
+  deleteServerResult: Promise<boolean> = Promise.resolve(true);
   async deleteServer(id: number): Promise<boolean> {
     return this.deleteServerResult;
   }
