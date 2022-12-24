@@ -62,8 +62,10 @@ export class CDK implements ICDK {
       .command("deploy")
       .description("deploy infrastructure")
       .option("--debug", "enable debug output")
-      .action((options: { debug?: boolean }) => {
+      .option("--force", "force deployment without users confirmation")
+      .action((options: { debug?: boolean; force?: boolean }) => {
         this._enableDebug(options.debug);
+        this._enableForce(options.force);
         this._runDeploy().catch(showError);
       });
 
@@ -101,13 +103,16 @@ export class CDK implements ICDK {
       chalk.green(`Start deployment of ${chalk.bold(this.namespace)}`)
     );
     try {
-      const res = await this._generateChangesetDeployment();
-      if (!res) return; // do not continue without change
+      // Skip deployment changeset when user enables force option
+      if (process.env.CDK_FORCE == "0") {
+        const res = await this._generateChangesetDeployment();
+        if (!res) return; // do not continue without change
 
-      const ok = await yesno({
-        question: chalk.yellow("Do you want to deploy the changes?"),
-      });
-      if (!ok) return;
+        const ok = await yesno({
+          question: chalk.yellow("Do you want to deploy the changes?"),
+        });
+        if (!ok) return;
+      }
 
       const apiFactory = new APIFactory();
       await Promise.all(this._resources.map((obj) => obj.apply(apiFactory)));
@@ -226,6 +231,11 @@ export class CDK implements ICDK {
   // Enable or disable debug output
   private _enableDebug(debug: boolean | undefined): void {
     process.env.CDK_DEBUG = debug ? "1" : "0";
+  }
+
+  // Enable force deployment that disables the users input
+  private _enableForce(force: boolean | undefined): void {
+    process.env.CDK_FORCE = force ? "1" : "0";
   }
 
   // Load selected datacenter

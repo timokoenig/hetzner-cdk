@@ -69,6 +69,10 @@ const ipv4 = new FloatingIP({
 server.addFloatingIP(ipv4)
 ```
 
+### Options
+
+In some cases you might want to deploy your stack to hetzner without getting the users confirmation. In that case you can append the `--force` option to the deploy command.
+
 ## TODOs
 - [ ] Implement pagination for all requests
 - [ ] Add option to either destroy only given resources or everything within the namespace
