@@ -1,6 +1,11 @@
 import chalk from "chalk";
 import { Operation } from "../classes/resource";
-import { formatChangesetTableRow, resourceNameFormatter } from "./formatter";
+import {
+  extractDockerImageVersion,
+  formatChangesetTableRow,
+  formatDockerImage,
+  resourceNameFormatter,
+} from "./formatter";
 
 describe("formatChangesetTableRow", () => {
   test("ADD", () => {
@@ -74,5 +79,39 @@ describe("resourceNameFormatter", () => {
     expect(resourceNameFormatter("space", "foo-bar_world")).toBe(
       "space-foo-bar-world"
     );
+  });
+});
+
+describe("formatDockerImage", () => {
+  test("format with version 1.0.0", () => {
+    expect(formatDockerImage("docker.io/library/httpd:1.0.0")).toBe(
+      "docker.io/library/httpd:1.0.0"
+    );
+  });
+  test("format with version latest", () => {
+    expect(formatDockerImage("docker.io/library/httpd:latest")).toBe(
+      "docker.io/library/httpd:latest"
+    );
+  });
+  test("format without version", () => {
+    expect(formatDockerImage("docker.io/library/httpd")).toBe(
+      "docker.io/library/httpd:latest"
+    );
+  });
+});
+
+describe("extractDockerImageVersion", () => {
+  test("extract with version 1.0.0", () => {
+    expect(extractDockerImageVersion("docker.io/library/httpd:1.0.0")).toBe(
+      "1.0.0"
+    );
+  });
+  test("extract with version latest", () => {
+    expect(extractDockerImageVersion("docker.io/library/httpd:latest")).toBe(
+      "latest"
+    );
+  });
+  test("extract without version", () => {
+    expect(extractDockerImageVersion("docker.io/library/httpd")).toBe("latest");
   });
 });

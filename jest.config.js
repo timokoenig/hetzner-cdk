@@ -4,6 +4,7 @@ export default {
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
+  roots: ['<rootDir>/src'],
   transformIgnorePatterns: ['<rootDir>/node_modules/'],
   collectCoverage: true,
   collectCoverageFrom: ["./src/**"],

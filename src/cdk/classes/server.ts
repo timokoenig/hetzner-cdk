@@ -4,7 +4,12 @@ import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
 import { HServerStatus } from "../../api/types/server";
 import { ICDK } from "../cdk";
-import { resourceNameFormatter } from "../utils/formatter";
+import { defaultCloudConfig } from "../utils/cloudconfig";
+import {
+  extractDockerImageVersion,
+  formatDockerImage,
+  resourceNameFormatter,
+} from "../utils/formatter";
 import { FloatingIP } from "./floatingip";
 import { PrimaryIP } from "./primaryip";
 import { Resource } from "./resource";
@@ -16,6 +21,7 @@ export type ServerOptions = {
   labels?: { [key: string]: string };
   serverType: string;
   userData?: string;
+  dockerImage?: string;
   enableIPv4?: boolean;
   enableIPv6?: boolean;
   protected?: boolean;
@@ -71,6 +77,26 @@ export class Server implements Resource {
       })
     );
 
+    const labels: { [key: string]: string } = {
+      ...this._options.labels,
+      namespace,
+    };
+
+    // If the user did not define a custom userData but set the dockerImage,
+    // then we use the default cloud config for our server
+    let cloudConfig = this._options.userData;
+    if (
+      this._options.userData === undefined &&
+      this._options.dockerImage !== undefined
+    ) {
+      const dockerImage = formatDockerImage(this._options.dockerImage);
+      cloudConfig = defaultCloudConfig(dockerImage);
+
+      // Save docker image version as server label so we can identify later if we need to restart
+      // the server to run a new version of the given docker image
+      labels.dockerImageVersion = extractDockerImageVersion(dockerImage);
+    }
+
     const allServers = await apiFactory.server.getAllServers({
       label_selector: `namespace=${namespace}`,
     });
@@ -78,7 +104,7 @@ export class Server implements Resource {
     if (server) {
       // Server already exists; check for updates
       const res = await apiFactory.server.updateServer(server.id, {
-        labels: { ...this._options.labels, namespace },
+        labels,
         name: this.getName(),
       });
       return res.id;
@@ -89,7 +115,7 @@ export class Server implements Resource {
         datacenter: this.cdk?.datacenter.id.toString(),
         firewalls: undefined,
         image: this._options.image,
-        labels: { ...this._options.labels, namespace },
+        labels,
         name: this.getName(),
         networks: undefined,
         placement_group: undefined,
@@ -102,7 +128,7 @@ export class Server implements Resource {
         server_type: this._options.serverType,
         ssh_keys: sshkey ? [sshkey] : [],
         start_after_create: true,
-        user_data: this._options.userData,
+        user_data: cloudConfig,
         volumes: [],
       });
 

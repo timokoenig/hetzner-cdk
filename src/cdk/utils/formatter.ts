@@ -73,3 +73,26 @@ export function resourceNameFormatter(namespace: string, name: string): string {
     .replace(" ", "-")
     .replace("_", "-")}`;
 }
+
+// Format docker image to include version if it does not exist
+export function formatDockerImage(dockerImage: string): string {
+  const imageParts = dockerImage.split(":");
+  let version = "latest";
+  if (imageParts.length == 1) {
+    dockerImage = `${dockerImage}:${version}`;
+  } else if (imageParts.length == 2) {
+    version = imageParts[1];
+  } else if (imageParts.length > 2) {
+    throw new Error("invalid docker image version");
+  }
+  return dockerImage;
+}
+
+// Extract docker image version from string
+export function extractDockerImageVersion(dockerImage: string): string {
+  const imageParts = dockerImage.split(":");
+  if (imageParts.length == 2) {
+    return imageParts[1];
+  }
+  return "latest";
+}
