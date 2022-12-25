@@ -103,9 +103,7 @@ export class PrimaryIP implements Resource {
     );
     if (resourcesToBeRemoved.length == 0) return false;
     const res = await Promise.all(
-      resourcesToBeRemoved.map((obj) =>
-        apiFactory.primaryip.deletePrimaryIP(obj.id)
-      )
+      resourcesToBeRemoved.map((obj) => apiFactory.primaryip.deletePrimaryIP(obj.id))
     );
     return res.findIndex((obj) => obj === false)! != 1;
   }

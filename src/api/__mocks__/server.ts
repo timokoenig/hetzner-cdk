@@ -32,18 +32,12 @@ export class ServerAPIMock implements IServerAPI {
   }
 
   updateServerResult: Promise<HServer> = Promise.resolve(HServerMock);
-  async updateServer(
-    id: number,
-    params: ServerUpdateRequest
-  ): Promise<HServer> {
+  async updateServer(id: number, params: ServerUpdateRequest): Promise<HServer> {
     return this.updateServerResult;
   }
 
   changeProtectionResult: Promise<HAction> = Promise.resolve(HActionMock);
-  async changeProtection(
-    id: number,
-    params: ServerProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: ServerProtectionRequest): Promise<HAction> {
     return this.changeProtectionResult;
   }
 }

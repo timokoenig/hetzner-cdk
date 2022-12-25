@@ -93,10 +93,7 @@ export class Server implements Resource {
     // If the user did not define a custom userData but set the dockerImage,
     // then we use the default cloud config for our server
     let cloudConfig = this._options.userData;
-    if (
-      this._options.userData === undefined &&
-      this._options.dockerImage !== undefined
-    ) {
+    if (this._options.userData === undefined && this._options.dockerImage !== undefined) {
       const dockerImage = formatDockerImage(this._options.dockerImage);
       cloudConfig = defaultCloudConfig(dockerImage);
 
@@ -161,11 +158,7 @@ export class Server implements Resource {
             const url = `http://${ip}`;
             console.log(chalk.yellow(`[Server] Run health check for ${url}`));
             try {
-              await this._waitForServerToBeHealthy(
-                url,
-                this._options.healthCheck,
-                moment()
-              );
+              await this._waitForServerToBeHealthy(url, this._options.healthCheck, moment());
               console.log(chalk.green("[Server] Service is healthy"));
             } catch (error: unknown) {
               console.log(chalk.red(error));
@@ -272,9 +265,8 @@ export class Server implements Resource {
     });
     const resourcesToBeRemoved = remoteResources.filter(
       (server) =>
-        localResourceNames.findIndex(
-          (name) => name == server.name && !server.protection.delete
-        ) == -1
+        localResourceNames.findIndex((name) => name == server.name && !server.protection.delete) ==
+        -1
     );
     if (resourcesToBeRemoved.length == 0) return false;
     const res = await Promise.all(

@@ -4,8 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const authToken =
-  process.env.NODE_ENV === "test" ? "-" : process.env.HETZNER_AUTH_TOKEN;
+const authToken = process.env.NODE_ENV === "test" ? "-" : process.env.HETZNER_AUTH_TOKEN;
 if (!authToken) {
   console.log(chalk.red(`Missing environment variable 'HETZNER_AUTH_TOKEN'`));
   process.exit(1);
@@ -33,11 +32,7 @@ client.interceptors.response.use((response: AxiosResponse) => {
   } else {
     if (process.env.CDK_DEBUG == "1") {
       console.log(
-        chalk.gray(
-          `[${response.request?.method}]`,
-          response.status,
-          response.request?.path
-        )
+        chalk.gray(`[${response.request?.method}]`, response.status, response.request?.path)
       );
     }
   }

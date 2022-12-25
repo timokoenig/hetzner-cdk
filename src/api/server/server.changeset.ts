@@ -56,10 +56,7 @@ export class ServerAPIChangeset implements IServerAPI {
     }
   }
 
-  async updateServer(
-    id: number,
-    params: ServerUpdateRequest
-  ): Promise<HServer> {
+  async updateServer(id: number, params: ServerUpdateRequest): Promise<HServer> {
     const currentData = await this._serverApi.getServer(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
@@ -67,10 +64,7 @@ export class ServerAPIChangeset implements IServerAPI {
       valueOld.push(`name: ${currentData.name}`);
       valueNew.push(`name: ${params.name}`);
     }
-    if (
-      params.labels &&
-      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
-    ) {
+    if (params.labels && JSON.stringify(currentData.labels) != JSON.stringify(params.labels)) {
       valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }
@@ -88,10 +82,7 @@ export class ServerAPIChangeset implements IServerAPI {
     return HServerMock;
   }
 
-  async changeProtection(
-    id: number,
-    params: ServerProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: ServerProtectionRequest): Promise<HAction> {
     const currentData = await this._serverApi.getServer(id);
     if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({

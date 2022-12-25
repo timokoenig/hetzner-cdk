@@ -25,19 +25,13 @@ export interface ISSHKeyAPI {
 
 export class SSHKeyAPI implements ISSHKeyAPI {
   async getAllSSHKeys(params?: SSHKeyGetAllRequest): Promise<HSSHKey[]> {
-    const res: AxiosResponse<SSHKeyGetAllResponse> = await client.get(
-      "/ssh_keys",
-      { params }
-    );
+    const res: AxiosResponse<SSHKeyGetAllResponse> = await client.get("/ssh_keys", { params });
     if (Array.isArray(res.data.ssh_keys)) return res.data.ssh_keys;
     return [res.data.ssh_keys];
   }
 
   async createSSHKey(params: SSHKeyCreateRequest): Promise<HSSHKey> {
-    const res: AxiosResponse<SSHKeyCreateResponse> = await client.post(
-      "/ssh_keys",
-      params
-    );
+    const res: AxiosResponse<SSHKeyCreateResponse> = await client.post("/ssh_keys", params);
     return res.data.ssh_key;
   }
 
@@ -47,16 +41,11 @@ export class SSHKeyAPI implements ISSHKeyAPI {
   }
 
   async getSSHKey(id: number): Promise<HSSHKey> {
-    const res: AxiosResponse<SSHKeyGetResponse> = await client.get(
-      `/ssh_keys/${id}`
-    );
+    const res: AxiosResponse<SSHKeyGetResponse> = await client.get(`/ssh_keys/${id}`);
     return res.data.ssh_key;
   }
 
-  async updateSSHKey(
-    id: number,
-    params: SSHKeyUpdateRequest
-  ): Promise<HSSHKey> {
+  async updateSSHKey(id: number, params: SSHKeyUpdateRequest): Promise<HSSHKey> {
     const currentData = await this.getSSHKey(id);
     if (
       (!params.name || currentData.name == params.name) &&
@@ -66,10 +55,7 @@ export class SSHKeyAPI implements ISSHKeyAPI {
       return currentData;
     }
 
-    const res: AxiosResponse<SSHKeyUpdateResponse> = await client.put(
-      `/ssh_keys/${id}`,
-      params
-    );
+    const res: AxiosResponse<SSHKeyUpdateResponse> = await client.put(`/ssh_keys/${id}`, params);
     return res.data.ssh_key;
   }
 }

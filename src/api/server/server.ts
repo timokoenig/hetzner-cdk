@@ -24,26 +24,17 @@ export interface IServerAPI {
   deleteServer(id: number): Promise<boolean>;
   getServer(id: number): Promise<HServer>;
   updateServer(id: number, params: ServerUpdateRequest): Promise<HServer>;
-  changeProtection(
-    id: number,
-    params: ServerProtectionRequest
-  ): Promise<HAction>;
+  changeProtection(id: number, params: ServerProtectionRequest): Promise<HAction>;
 }
 
 export class ServerAPI implements IServerAPI {
   async getAllServers(params?: ServerGetAllRequest): Promise<HServer[]> {
-    const res: AxiosResponse<ServerGetAllResponse> = await client.get(
-      "/servers",
-      { params }
-    );
+    const res: AxiosResponse<ServerGetAllResponse> = await client.get("/servers", { params });
     return res.data.servers;
   }
 
   async createServer(params: ServerCreateRequest): Promise<HServer> {
-    const res: AxiosResponse<ServerCreateResponse> = await client.post(
-      "/servers",
-      params
-    );
+    const res: AxiosResponse<ServerCreateResponse> = await client.post("/servers", params);
     return res.data.server;
   }
 
@@ -58,16 +49,11 @@ export class ServerAPI implements IServerAPI {
   }
 
   async getServer(id: number): Promise<HServer> {
-    const res: AxiosResponse<ServerGetResponse> = await client.get(
-      `/servers/${id}`
-    );
+    const res: AxiosResponse<ServerGetResponse> = await client.get(`/servers/${id}`);
     return res.data.server;
   }
 
-  async updateServer(
-    id: number,
-    params: ServerUpdateRequest
-  ): Promise<HServer> {
+  async updateServer(id: number, params: ServerUpdateRequest): Promise<HServer> {
     const currentData = await this.getServer(id);
     if (
       (!params.name || currentData.name == params.name) &&
@@ -77,17 +63,11 @@ export class ServerAPI implements IServerAPI {
       return currentData;
     }
 
-    const res: AxiosResponse<ServerUpdateResponse> = await client.put(
-      `/servers/${id}`,
-      params
-    );
+    const res: AxiosResponse<ServerUpdateResponse> = await client.put(`/servers/${id}`, params);
     return res.data.server;
   }
 
-  async changeProtection(
-    id: number,
-    params: ServerProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: ServerProtectionRequest): Promise<HAction> {
     const res: AxiosResponse<ServerProtectionResponse> = await client.post(
       `/servers/${id}/actions/change_protection`,
       params

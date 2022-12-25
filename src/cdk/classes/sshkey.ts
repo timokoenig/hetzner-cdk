@@ -72,8 +72,7 @@ export class SSHKey implements Resource {
       label_selector: `namespace=${namespace}`,
     });
     const resourcesToBeRemoved = remoteResources.filter(
-      (sshkey) =>
-        localResourceNames.findIndex((name) => name == sshkey.name) == -1
+      (sshkey) => localResourceNames.findIndex((name) => name == sshkey.name) == -1
     );
     if (resourcesToBeRemoved.length == 0) return false;
     const res = await Promise.all(

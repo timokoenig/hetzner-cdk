@@ -10,9 +10,7 @@ describe("PublicKey", () => {
       const sut = PublicKey.fromFile("./missing-file.ts");
       fail("should fail with missing file");
     } catch (err: unknown) {
-      expect(`${err}`).toBe(
-        "Error: ENOENT: no such file or directory, open './missing-file.ts'"
-      );
+      expect(`${err}`).toBe("Error: ENOENT: no such file or directory, open './missing-file.ts'");
     }
   });
 });

@@ -21,15 +21,17 @@ describe("PrimaryIP", () => {
   describe("apply", () => {
     test("succeeds with new primaryip", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult =
-        Promise.resolve([HPrimaryIPMock]);
+      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult = Promise.resolve([
+        HPrimaryIPMock,
+      ]);
       const res = await sut.apply(factoryMock);
       expect(res).toBe(0);
     });
     test("succeeds with existing primaryip", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult =
-        Promise.resolve([{ ...HPrimaryIPMock, name: "mock-primaryip" }]);
+      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult = Promise.resolve([
+        { ...HPrimaryIPMock, name: "mock-primaryip" },
+      ]);
       const res = await sut.apply(factoryMock);
       expect(res).toBe(0);
     });
@@ -37,10 +39,10 @@ describe("PrimaryIP", () => {
   describe("delete", () => {
     test("succeeds with primaryip", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult =
-        Promise.resolve([{ ...HPrimaryIPMock, name: "mock-primaryip" }]);
-      (factoryMock.primaryip as PrimaryIPAPIMock).deletePrimaryIPResult =
-        Promise.resolve(true);
+      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult = Promise.resolve([
+        { ...HPrimaryIPMock, name: "mock-primaryip" },
+      ]);
+      (factoryMock.primaryip as PrimaryIPAPIMock).deletePrimaryIPResult = Promise.resolve(true);
       const res = await sut.delete(factoryMock);
       expect(res).toBeTruthy();
     });
@@ -53,39 +55,26 @@ describe("PrimaryIP", () => {
   describe("deleteUnusedResources", () => {
     test("succeeds with existing primaryips", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult =
-        Promise.resolve([{ ...HPrimaryIPMock, name: "mock-primaryip" }]);
-      (factoryMock.primaryip as PrimaryIPAPIMock).deletePrimaryIPResult =
-        Promise.resolve(true);
-      const res = await PrimaryIP.deleteUnusedResources(
-        [],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult = Promise.resolve([
+        { ...HPrimaryIPMock, name: "mock-primaryip" },
+      ]);
+      (factoryMock.primaryip as PrimaryIPAPIMock).deletePrimaryIPResult = Promise.resolve(true);
+      const res = await PrimaryIP.deleteUnusedResources([], "mock", factoryMock);
       expect(res).toBeTruthy();
     });
     test("fails with local matches remote", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult =
-        Promise.resolve([{ ...HPrimaryIPMock, name: "mock-primaryip" }]);
-      (factoryMock.primaryip as PrimaryIPAPIMock).deletePrimaryIPResult =
-        Promise.resolve(true);
-      const res = await PrimaryIP.deleteUnusedResources(
-        ["mock-primaryip"],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult = Promise.resolve([
+        { ...HPrimaryIPMock, name: "mock-primaryip" },
+      ]);
+      (factoryMock.primaryip as PrimaryIPAPIMock).deletePrimaryIPResult = Promise.resolve(true);
+      const res = await PrimaryIP.deleteUnusedResources(["mock-primaryip"], "mock", factoryMock);
       expect(res).toBeFalsy();
     });
     test("fails without primaryips", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult =
-        Promise.resolve([]);
-      const res = await PrimaryIP.deleteUnusedResources(
-        ["mock-primaryip"],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.primaryip as PrimaryIPAPIMock).getAllPrimaryIPsResult = Promise.resolve([]);
+      const res = await PrimaryIP.deleteUnusedResources(["mock-primaryip"], "mock", factoryMock);
       expect(res).toBeFalsy();
     });
   });

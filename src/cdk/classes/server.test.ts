@@ -22,15 +22,15 @@ describe("Server", () => {
   describe("apply", () => {
     test("succeeds with new server", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.server as ServerAPIMock).getAllServersResult =
-        Promise.resolve([HServerMock]);
+      (factoryMock.server as ServerAPIMock).getAllServersResult = Promise.resolve([HServerMock]);
       const res = await sut.apply(factoryMock);
       expect(res).toBe(0);
     });
     test("succeeds with existing server", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.server as ServerAPIMock).getAllServersResult =
-        Promise.resolve([{ ...HServerMock, name: "mock-server" }]);
+      (factoryMock.server as ServerAPIMock).getAllServersResult = Promise.resolve([
+        { ...HServerMock, name: "mock-server" },
+      ]);
       const res = await sut.apply(factoryMock);
       expect(res).toBe(0);
     });
@@ -38,10 +38,10 @@ describe("Server", () => {
   describe("delete", () => {
     test("succeeds with server", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.server as ServerAPIMock).getAllServersResult =
-        Promise.resolve([{ ...HServerMock, name: "mock-server" }]);
-      (factoryMock.server as ServerAPIMock).deleteServerResult =
-        Promise.resolve(true);
+      (factoryMock.server as ServerAPIMock).getAllServersResult = Promise.resolve([
+        { ...HServerMock, name: "mock-server" },
+      ]);
+      (factoryMock.server as ServerAPIMock).deleteServerResult = Promise.resolve(true);
       const res = await sut.delete(factoryMock);
       expect(res).toBeTruthy();
     });
@@ -54,35 +54,26 @@ describe("Server", () => {
   describe("deleteUnusedResources", () => {
     test("succeeds with existing servers", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.server as ServerAPIMock).getAllServersResult =
-        Promise.resolve([{ ...HServerMock, name: "mock-server" }]);
-      (factoryMock.server as ServerAPIMock).deleteServerResult =
-        Promise.resolve(true);
+      (factoryMock.server as ServerAPIMock).getAllServersResult = Promise.resolve([
+        { ...HServerMock, name: "mock-server" },
+      ]);
+      (factoryMock.server as ServerAPIMock).deleteServerResult = Promise.resolve(true);
       const res = await Server.deleteUnusedResources([], "mock", factoryMock);
       expect(res).toBeTruthy();
     });
     test("fails with local matches remote", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.server as ServerAPIMock).getAllServersResult =
-        Promise.resolve([{ ...HServerMock, name: "mock-server" }]);
-      (factoryMock.server as ServerAPIMock).deleteServerResult =
-        Promise.resolve(true);
-      const res = await Server.deleteUnusedResources(
-        ["mock-server"],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.server as ServerAPIMock).getAllServersResult = Promise.resolve([
+        { ...HServerMock, name: "mock-server" },
+      ]);
+      (factoryMock.server as ServerAPIMock).deleteServerResult = Promise.resolve(true);
+      const res = await Server.deleteUnusedResources(["mock-server"], "mock", factoryMock);
       expect(res).toBeFalsy();
     });
     test("fails without servers", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.server as ServerAPIMock).getAllServersResult =
-        Promise.resolve([]);
-      const res = await Server.deleteUnusedResources(
-        ["mock-server"],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.server as ServerAPIMock).getAllServersResult = Promise.resolve([]);
+      const res = await Server.deleteUnusedResources(["mock-server"], "mock", factoryMock);
       expect(res).toBeFalsy();
     });
   });

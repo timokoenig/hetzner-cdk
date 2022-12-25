@@ -12,9 +12,7 @@ import { HPrimaryIPMock } from "../types/__mocks__/primaryip-mock";
 
 export class PrimaryIPAPIMock implements IPrimaryIPAPI {
   getAllPrimaryIPsResult: Promise<HPrimaryIP[]> = Promise.resolve([]);
-  async getAllPrimaryIPs(
-    params?: PrimaryIPGetAllRequest
-  ): Promise<HPrimaryIP[]> {
+  async getAllPrimaryIPs(params?: PrimaryIPGetAllRequest): Promise<HPrimaryIP[]> {
     return this.getAllPrimaryIPsResult;
   }
 
@@ -34,18 +32,12 @@ export class PrimaryIPAPIMock implements IPrimaryIPAPI {
   }
 
   updatePrimaryIPResult: Promise<HPrimaryIP> = Promise.resolve(HPrimaryIPMock);
-  async updatePrimaryIP(
-    id: number,
-    params: PrimaryIPUpdateRequest
-  ): Promise<HPrimaryIP> {
+  async updatePrimaryIP(id: number, params: PrimaryIPUpdateRequest): Promise<HPrimaryIP> {
     return this.updatePrimaryIPResult;
   }
 
   changeProtectionResult: Promise<HAction> = Promise.resolve(HActionMock);
-  async changeProtection(
-    id: number,
-    params: PrimaryIPProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: PrimaryIPProtectionRequest): Promise<HAction> {
     return this.changeProtectionResult;
   }
 }

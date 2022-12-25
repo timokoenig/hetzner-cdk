@@ -29,10 +29,7 @@ export class SSHKeyAPIMock implements ISSHKeyAPI {
   }
 
   updateSSHKeyResult: Promise<HSSHKey> = Promise.resolve(HSSHKeyMock);
-  async updateSSHKey(
-    id: number,
-    params: SSHKeyUpdateRequest
-  ): Promise<HSSHKey> {
+  async updateSSHKey(id: number, params: SSHKeyUpdateRequest): Promise<HSSHKey> {
     return this.updateSSHKeyResult;
   }
 }

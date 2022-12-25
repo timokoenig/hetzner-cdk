@@ -12,17 +12,12 @@ import { HFloatingIPMock } from "../types/__mocks__/floatingip-mock";
 
 export class FloatingIPAPIMock implements IFloatingIPAPI {
   getAllFloatingIPsResult: Promise<HFloatingIP[]> = Promise.resolve([]);
-  async getAllFloatingIPs(
-    params?: FloatingIPGetAllRequest
-  ): Promise<HFloatingIP[]> {
+  async getAllFloatingIPs(params?: FloatingIPGetAllRequest): Promise<HFloatingIP[]> {
     return this.getAllFloatingIPsResult;
   }
 
-  createFloatingIPResult: Promise<HFloatingIP> =
-    Promise.resolve(HFloatingIPMock);
-  async createFloatingIP(
-    params: FloatingIPCreateRequest
-  ): Promise<HFloatingIP> {
+  createFloatingIPResult: Promise<HFloatingIP> = Promise.resolve(HFloatingIPMock);
+  async createFloatingIP(params: FloatingIPCreateRequest): Promise<HFloatingIP> {
     return this.createFloatingIPResult;
   }
 
@@ -36,20 +31,13 @@ export class FloatingIPAPIMock implements IFloatingIPAPI {
     return this.getFloatingIPResult;
   }
 
-  updateFloatingIPResult: Promise<HFloatingIP> =
-    Promise.resolve(HFloatingIPMock);
-  async updateFloatingIP(
-    id: number,
-    params: FloatingIPUpdateRequest
-  ): Promise<HFloatingIP> {
+  updateFloatingIPResult: Promise<HFloatingIP> = Promise.resolve(HFloatingIPMock);
+  async updateFloatingIP(id: number, params: FloatingIPUpdateRequest): Promise<HFloatingIP> {
     return this.updateFloatingIPResult;
   }
 
   changeProtectionResult: Promise<HAction> = Promise.resolve(HActionMock);
-  async changeProtection(
-    id: number,
-    params: FloatingIPProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: FloatingIPProtectionRequest): Promise<HAction> {
     return this.changeProtectionResult;
   }
 }

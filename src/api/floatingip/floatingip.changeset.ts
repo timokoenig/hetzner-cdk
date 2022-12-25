@@ -21,15 +21,11 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     this._serverApi = serverApi;
   }
 
-  async getAllFloatingIPs(
-    params?: FloatingIPGetAllRequest
-  ): Promise<HFloatingIP[]> {
+  async getAllFloatingIPs(params?: FloatingIPGetAllRequest): Promise<HFloatingIP[]> {
     return this._serverApi.getAllFloatingIPs(params);
   }
 
-  async createFloatingIP(
-    params: FloatingIPCreateRequest
-  ): Promise<HFloatingIP> {
+  async createFloatingIP(params: FloatingIPCreateRequest): Promise<HFloatingIP> {
     this._cdk.changeset.push({
       operation: Operation.ADD,
       type: ResourceType.FLOATINGIP,
@@ -60,10 +56,7 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     }
   }
 
-  async updateFloatingIP(
-    id: number,
-    params: FloatingIPUpdateRequest
-  ): Promise<HFloatingIP> {
+  async updateFloatingIP(id: number, params: FloatingIPUpdateRequest): Promise<HFloatingIP> {
     const currentData = await this._serverApi.getFloatingIP(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
@@ -75,10 +68,7 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
       valueOld.push(`description: ${currentData.description}`);
       valueNew.push(`description: ${params.description}`);
     }
-    if (
-      params.labels &&
-      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
-    ) {
+    if (params.labels && JSON.stringify(currentData.labels) != JSON.stringify(params.labels)) {
       valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }
@@ -96,10 +86,7 @@ export class FloatingIPAPIChangeset implements IFloatingIPAPI {
     return HFloatingIPMock;
   }
 
-  async changeProtection(
-    id: number,
-    params: FloatingIPProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: FloatingIPProtectionRequest): Promise<HAction> {
     const currentData = await this._serverApi.getFloatingIP(id);
     if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({

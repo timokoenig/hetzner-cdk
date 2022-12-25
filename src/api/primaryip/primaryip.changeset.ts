@@ -21,9 +21,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     this._serverApi = serverApi;
   }
 
-  async getAllPrimaryIPs(
-    params?: PrimaryIPGetAllRequest
-  ): Promise<HPrimaryIP[]> {
+  async getAllPrimaryIPs(params?: PrimaryIPGetAllRequest): Promise<HPrimaryIP[]> {
     return this._serverApi.getAllPrimaryIPs(params);
   }
 
@@ -58,10 +56,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     }
   }
 
-  async updatePrimaryIP(
-    id: number,
-    params: PrimaryIPUpdateRequest
-  ): Promise<HPrimaryIP> {
+  async updatePrimaryIP(id: number, params: PrimaryIPUpdateRequest): Promise<HPrimaryIP> {
     const currentData = await this._serverApi.getPrimaryIP(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
@@ -73,10 +68,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
       valueOld.push(`auto_delete: ${currentData.auto_delete}`);
       valueNew.push(`auto_delete: ${params.auto_delete}`);
     }
-    if (
-      params.labels &&
-      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
-    ) {
+    if (params.labels && JSON.stringify(currentData.labels) != JSON.stringify(params.labels)) {
       valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }
@@ -94,10 +86,7 @@ export class PrimaryIPAPIChangeset implements IPrimaryIPAPI {
     return HPrimaryIPMock;
   }
 
-  async changeProtection(
-    id: number,
-    params: PrimaryIPProtectionRequest
-  ): Promise<HAction> {
+  async changeProtection(id: number, params: PrimaryIPProtectionRequest): Promise<HAction> {
     const currentData = await this._serverApi.getPrimaryIP(id);
     if (currentData.protection.delete != params.delete) {
       this._cdk.changeset.push({

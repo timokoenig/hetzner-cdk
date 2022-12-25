@@ -49,10 +49,7 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
     }
   }
 
-  async updateSSHKey(
-    id: number,
-    params: SSHKeyUpdateRequest
-  ): Promise<HSSHKey> {
+  async updateSSHKey(id: number, params: SSHKeyUpdateRequest): Promise<HSSHKey> {
     const currentData = await this._sshkeyApi.getSSHKey(id);
     let valueOld: string[] = [];
     let valueNew: string[] = [];
@@ -60,10 +57,7 @@ export class SSHKeyAPIChangeset implements ISSHKeyAPI {
       valueOld.push(`name: ${currentData.name}`);
       valueNew.push(`name: ${params.name}`);
     }
-    if (
-      params.labels &&
-      JSON.stringify(currentData.labels) != JSON.stringify(params.labels)
-    ) {
+    if (params.labels && JSON.stringify(currentData.labels) != JSON.stringify(params.labels)) {
       valueOld.push(`labels: ${JSON.stringify(currentData.labels)}`);
       valueNew.push(`labels: ${JSON.stringify(params.labels)}`);
     }

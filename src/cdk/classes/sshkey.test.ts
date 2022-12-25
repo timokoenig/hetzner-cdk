@@ -19,15 +19,15 @@ describe("SSHKey", () => {
   describe("apply", () => {
     test("succeeds with new key", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult =
-        Promise.resolve([HSSHKeyMock]);
+      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult = Promise.resolve([HSSHKeyMock]);
       const res = await sut.apply(factoryMock);
       expect(res).toBe(0);
     });
     test("succeeds with existing key", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult =
-        Promise.resolve([{ ...HSSHKeyMock, name: "mock-key" }]);
+      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult = Promise.resolve([
+        { ...HSSHKeyMock, name: "mock-key" },
+      ]);
       const res = await sut.apply(factoryMock);
       expect(res).toBe(0);
     });
@@ -35,10 +35,10 @@ describe("SSHKey", () => {
   describe("delete", () => {
     test("succeeds with ssh key", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult =
-        Promise.resolve([{ ...HSSHKeyMock, name: "mock-key" }]);
-      (factoryMock.sshkey as SSHKeyAPIMock).deleteSSHKeyResult =
-        Promise.resolve(true);
+      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult = Promise.resolve([
+        { ...HSSHKeyMock, name: "mock-key" },
+      ]);
+      (factoryMock.sshkey as SSHKeyAPIMock).deleteSSHKeyResult = Promise.resolve(true);
       const res = await sut.delete(factoryMock);
       expect(res).toBeTruthy();
     });
@@ -51,35 +51,26 @@ describe("SSHKey", () => {
   describe("deleteUnusedResources", () => {
     test("succeeds with existing ssh keys", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult =
-        Promise.resolve([{ ...HSSHKeyMock, name: "mock-key" }]);
-      (factoryMock.sshkey as SSHKeyAPIMock).deleteSSHKeyResult =
-        Promise.resolve(true);
+      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult = Promise.resolve([
+        { ...HSSHKeyMock, name: "mock-key" },
+      ]);
+      (factoryMock.sshkey as SSHKeyAPIMock).deleteSSHKeyResult = Promise.resolve(true);
       const res = await SSHKey.deleteUnusedResources([], "mock", factoryMock);
       expect(res).toBeTruthy();
     });
     test("fails with local matches remote", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult =
-        Promise.resolve([{ ...HSSHKeyMock, name: "mock-key" }]);
-      (factoryMock.sshkey as SSHKeyAPIMock).deleteSSHKeyResult =
-        Promise.resolve(true);
-      const res = await SSHKey.deleteUnusedResources(
-        ["mock-key"],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult = Promise.resolve([
+        { ...HSSHKeyMock, name: "mock-key" },
+      ]);
+      (factoryMock.sshkey as SSHKeyAPIMock).deleteSSHKeyResult = Promise.resolve(true);
+      const res = await SSHKey.deleteUnusedResources(["mock-key"], "mock", factoryMock);
       expect(res).toBeFalsy();
     });
     test("fails without ssh keys", async () => {
       const factoryMock = new APIFactoryMock();
-      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult =
-        Promise.resolve([]);
-      const res = await SSHKey.deleteUnusedResources(
-        ["mock-key"],
-        "mock",
-        factoryMock
-      );
+      (factoryMock.sshkey as SSHKeyAPIMock).getAllSSHKeysResult = Promise.resolve([]);
+      const res = await SSHKey.deleteUnusedResources(["mock-key"], "mock", factoryMock);
       expect(res).toBeFalsy();
     });
   });

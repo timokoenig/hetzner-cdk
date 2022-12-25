@@ -99,9 +99,7 @@ export class CDK implements ICDK {
 
   // Deploy infrastructure
   private async _runDeploy(): Promise<void> {
-    console.log(
-      chalk.green(`Start deployment of ${chalk.bold(this.namespace)}`)
-    );
+    console.log(chalk.green(`Start deployment of ${chalk.bold(this.namespace)}`));
     try {
       // Skip deployment changeset when user enables force option
       if (process.env.CDK_FORCE == "0") {
@@ -180,9 +178,7 @@ export class CDK implements ICDK {
   private async _generateChangesetDeployment(): Promise<boolean> {
     // Use APIFactoryChangeset to mock all create/update/delete functions and create changeset entries
     const apiFactoryChangeset = new APIFactoryChangeset(this, new APIFactory());
-    await Promise.all(
-      this._resources.map((obj) => obj.apply(apiFactoryChangeset))
-    );
+    await Promise.all(this._resources.map((obj) => obj.apply(apiFactoryChangeset)));
     await this._deleteUnusedResources(apiFactoryChangeset);
 
     if (this.changeset.length == 0) {
@@ -192,27 +188,19 @@ export class CDK implements ICDK {
 
     // Print changeset table
     var table = new Table({
-      head: ["Operation", "ID", "Resource", "Old", "New"].map((obj) =>
-        chalk.white(obj)
-      ),
+      head: ["Operation", "ID", "Resource", "Old", "New"].map((obj) => chalk.white(obj)),
     });
-    this.changeset
-      .map(formatChangesetTableRow)
-      .forEach((obj) => table.push(obj));
+    this.changeset.map(formatChangesetTableRow).forEach((obj) => table.push(obj));
     console.log(table.toString());
 
     return true;
   }
 
   // Generate changeset for all resources that are about the get destroyed
-  private async _generateChangesetDestroy(
-    localResources: Resource[]
-  ): Promise<boolean> {
+  private async _generateChangesetDestroy(localResources: Resource[]): Promise<boolean> {
     // Use APIFactoryChangeset to mock all create/update/delete functions and create changeset entries
     const apiFactoryChangeset = new APIFactoryChangeset(this, new APIFactory());
-    await Promise.all(
-      localResources.map((obj) => obj.delete(apiFactoryChangeset))
-    );
+    await Promise.all(localResources.map((obj) => obj.delete(apiFactoryChangeset)));
 
     if (this.changeset.length == 0) {
       console.log(chalk.green("Nothing to destroy"));
@@ -221,13 +209,9 @@ export class CDK implements ICDK {
 
     // Print changeset table
     var table = new Table({
-      head: ["Operation", "ID", "Resource", "Old", "New"].map((obj) =>
-        chalk.white(obj)
-      ),
+      head: ["Operation", "ID", "Resource", "Old", "New"].map((obj) => chalk.white(obj)),
     });
-    this.changeset
-      .map(formatChangesetTableRow)
-      .forEach((obj) => table.push(obj));
+    this.changeset.map(formatChangesetTableRow).forEach((obj) => table.push(obj));
     console.log(table.toString());
 
     return true;
@@ -246,9 +230,7 @@ export class CDK implements ICDK {
   // Load selected datacenter
   private static async loadDatacenter(name: DATACENTER): Promise<HDatacenter> {
     const allDatacenters = await getAllDatacenters();
-    const datacenter = allDatacenters.datacenters.find((obj) =>
-      obj.description.includes(name)
-    );
+    const datacenter = allDatacenters.datacenters.find((obj) => obj.description.includes(name));
     if (!datacenter) throw new Error(`Datacenter '${name}' not found`);
     return datacenter;
   }
@@ -263,9 +245,7 @@ export class CDK implements ICDK {
       ALL_AVAILABLE_RESOURCES.map((resourceClass) =>
         resourceClass.deleteUnusedResources(
           localResources
-            .filter(
-              (obj) => (obj as Object).constructor.name == resourceClass.name
-            )
+            .filter((obj) => (obj as Object).constructor.name == resourceClass.name)
             .map((obj) => obj.getName()),
           this.namespace,
           apiFactory

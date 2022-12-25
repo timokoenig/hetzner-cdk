@@ -3,9 +3,7 @@ import chalk from "chalk";
 import { Operation, ResourceChangeset } from "../classes/resource";
 
 // Convert changeset to table row
-export function formatChangesetTableRow(
-  changeset: ResourceChangeset
-): string[] {
+export function formatChangesetTableRow(changeset: ResourceChangeset): string[] {
   const colorValue = (operation: Operation, value: string): string => {
     if (operation == Operation.ADD) {
       return chalk.green(value);
@@ -68,10 +66,7 @@ export function resourceNameFormatter(namespace: string, name: string): string {
     console.log(chalk.red("Missing namespace"));
     process.exit(1);
   }
-  return `${namespace}-${name
-    .toLowerCase()
-    .replace(" ", "-")
-    .replace("_", "-")}`;
+  return `${namespace}-${name.toLowerCase().replace(" ", "-").replace("_", "-")}`;
 }
 
 // Format docker image to include version if it does not exist

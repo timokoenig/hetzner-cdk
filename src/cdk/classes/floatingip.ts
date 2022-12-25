@@ -101,9 +101,7 @@ export class FloatingIP implements Resource {
     );
     if (resourcesToBeRemoved.length == 0) return false;
     const res = await Promise.all(
-      resourcesToBeRemoved.map((obj) =>
-        apiFactory.floatingip.deleteFloatingIP(obj.id)
-      )
+      resourcesToBeRemoved.map((obj) => apiFactory.floatingip.deleteFloatingIP(obj.id))
     );
     return res.findIndex((obj) => obj === false)! != 1;
   }
