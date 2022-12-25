@@ -13,7 +13,7 @@ import { SSHKey } from "./classes/sshkey";
 import { formatChangesetTableRow, showError } from "./utils/formatter";
 import { logError, logInfo, logSuccess } from "./utils/logger";
 
-const CDK_VERSION = "0.1.1";
+const CDK_VERSION = "__packageJsonVersion__";
 
 const ALL_AVAILABLE_RESOURCES = [PrimaryIP, FloatingIP, Server, SSHKey];
 
