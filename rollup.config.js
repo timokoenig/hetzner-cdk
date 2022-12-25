@@ -1,9 +1,10 @@
 import replace from '@rollup/plugin-replace';
+import fs from 'fs';
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
-import packageJson from './package.json' assert { type: 'json' };
 
 const outputDir = 'dist'
+const packageJson = JSON.parse(fs.readFileSync('./package.json'))
 
 const bundle = config => ({
   ...config,
