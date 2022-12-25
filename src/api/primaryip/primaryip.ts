@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import chalk from "chalk";
+import { logDebug } from "../../cdk/utils/logger";
 import client from "../client";
 import { HAction } from "../types/action";
 import {
@@ -65,7 +65,7 @@ export class PrimaryIPAPI implements IPrimaryIPAPI {
       (!params.auto_delete || currentData.auto_delete == params.auto_delete) &&
       (!params.labels || currentData.labels == params.labels)
     ) {
-      console.log(chalk.gray("[PrimaryIPs] Nothing to update"));
+      logDebug("[PrimaryIP] Nothing to update");
       return currentData;
     }
 

@@ -1,5 +1,4 @@
 import axios from "axios";
-import chalk from "chalk";
 import moment from "moment";
 import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
@@ -11,6 +10,7 @@ import {
   formatDockerImage,
   resourceNameFormatter,
 } from "../utils/formatter";
+import { logError, logInfo, logSuccess } from "../utils/logger";
 import { sleep } from "../utils/sleep";
 import { FloatingIP } from "./floatingip";
 import { PrimaryIP } from "./primaryip";
@@ -76,8 +76,17 @@ export class Server implements Resource {
   }
 
   async apply(apiFactory: IAPIFactory): Promise<number> {
+    logInfo("[Server] Apply changes");
     const namespace = this.cdk?.namespace ?? "";
+
+    this._sshKey
+      ? logInfo("[Server] Apply change to attached SSH Key")
+      : logInfo("[Server] Server does not have an attached SSH Key");
     const sshkey = await this._sshKey?.apply(apiFactory);
+
+    this._primaryIPs.length > 0
+      ? logInfo("[Server] Apply change to attached Primary IPs")
+      : logInfo("[Server] Server does not have attached Primary IPs");
     const primaryIPs = await Promise.all(
       this._primaryIPs.map(async (obj) => {
         const primaryIPId = await obj.apply(apiFactory);
@@ -93,13 +102,20 @@ export class Server implements Resource {
     // If the user did not define a custom userData but set the dockerImage,
     // then we use the default cloud config for our server
     let cloudConfig = this._options.userData;
-    if (this._options.userData === undefined && this._options.dockerImage !== undefined) {
-      const dockerImage = formatDockerImage(this._options.dockerImage);
-      cloudConfig = defaultCloudConfig(dockerImage);
+    if (this._options.userData === undefined) {
+      if (this._options.dockerImage === undefined) {
+        logInfo("[Server] Do not use any cloud config");
+      } else {
+        const dockerImage = formatDockerImage(this._options.dockerImage);
+        logInfo(`[Server] Use default cloud config with docker image '${dockerImage}'`);
+        cloudConfig = defaultCloudConfig(dockerImage);
 
-      // Save docker image version as server label so we can identify later if we need to restart
-      // the server to run a new version of the given docker image
-      labels.dockerImageVersion = extractDockerImageVersion(dockerImage);
+        // Save docker image version as server label so we can identify later if we need to restart
+        // the server to run a new version of the given docker image
+        labels.dockerImageVersion = extractDockerImageVersion(dockerImage);
+      }
+    } else {
+      logInfo("[Server] Use given cloud config");
     }
 
     const allServers = await apiFactory.server.getAllServers({
@@ -108,13 +124,16 @@ export class Server implements Resource {
     const server = allServers.find((obj) => obj.name == this.getName());
     if (server) {
       // Server already exists; check for updates
+      logInfo("[Server] Update existing Server");
       const res = await apiFactory.server.updateServer(server.id, {
         labels,
         name: this.getName(),
       });
+      logSuccess("[Server] Successfully updated the existing Server");
       return res.id;
     } else {
       // Server does not exist; create new server
+      logInfo("[Server] Create new Server");
       const res = await apiFactory.server.createServer({
         automount: false,
         datacenter: this.cdk?.datacenter.id.toString(),
@@ -136,12 +155,14 @@ export class Server implements Resource {
         user_data: cloudConfig,
         volumes: [],
       });
+      logSuccess("[Server] Successfully created a new Server");
 
       if (apiFactory instanceof APIFactory) {
         // Wait until server is running
+        logInfo("[Server] Wait until new server is running");
         const createdAt = moment();
         await this._waitForServerToBeReady(apiFactory, res.id, createdAt);
-        console.log(chalk.gray(`Server ${res.name} is running`));
+        logSuccess(`[Server] Server ${res.name} is running`);
 
         // Update Server protection
         if (this._options.protected !== undefined) {
@@ -156,20 +177,20 @@ export class Server implements Resource {
           const ip = res.public_net.ipv4?.ip;
           if (ip) {
             const url = `http://${ip}`;
-            console.log(chalk.yellow(`[Server] Run health check for ${url}`));
+            logInfo(`[Server] Run health check for ${url}`);
             try {
               await this._waitForServerToBeHealthy(url, this._options.healthCheck, moment());
-              console.log(chalk.green("[Server] Service is healthy"));
+              logSuccess("[Server] Service is healthy");
             } catch (error: unknown) {
-              console.log(chalk.red(error));
-              console.log(chalk.red("[Server] Service is unhealthy"));
+              logError("[Server] Service is unhealthy");
+              logError(`${error}`);
               // TODO in the future we might want to trigger a rollback at this point
             }
           } else {
-            console.log("[Server] Skip health check; missing ip");
+            logInfo("[Server] Skip health check; missing ip");
           }
         } else {
-          console.log(chalk.gray("[Server] Skip health check"));
+          logInfo("[Server] Skip health check");
         }
       }
 
@@ -233,24 +254,29 @@ export class Server implements Resource {
     });
     const server = allServers.find((obj) => obj.name == this.getName());
     if (!server) {
-      console.log(chalk.red("[Server] Server does not exist; skip deletion"));
+      logError("[Server] Server does not exist; skip deletion");
       return false;
     }
     if (server.protection.delete) {
-      console.log(chalk.yellow("[Server] Server is protected; skip deletion"));
+      logInfo("[Server] Server is protected; skip deletion");
       return false;
     }
+    logInfo("[Server] Delete Server");
     const res = await apiFactory.server.deleteServer(server.id);
+    res
+      ? logInfo("[Server] Server marked for deletion")
+      : logError("[Server] Failed to delete Server");
     if (!res) return false;
 
     // Sleep for 5 seconds because the original wait sometimes does not work properly
+    logInfo("[Server] Wait until server has been deleted");
     await sleep(5);
 
     // Wait until server has been deleted
     if (apiFactory instanceof APIFactory) {
       const createdAt = moment();
       await this._waitForServerToBeDeleted(apiFactory, server.id, createdAt);
-      console.log(chalk.gray(`Server ${server.name} has been deleted`));
+      logInfo(`[Server] Successfully deleted the server`);
     }
     return true;
   }
@@ -260,6 +286,7 @@ export class Server implements Resource {
     namespace: string,
     apiFactory: IAPIFactory
   ): Promise<boolean> {
+    logInfo("[Server] Try to delete all unused resources");
     const remoteResources = await apiFactory.server.getAllServers({
       label_selector: `namespace=${namespace}`,
     });
@@ -268,10 +295,17 @@ export class Server implements Resource {
         localResourceNames.findIndex((name) => name == server.name && !server.protection.delete) ==
         -1
     );
-    if (resourcesToBeRemoved.length == 0) return false;
+    if (resourcesToBeRemoved.length == 0) {
+      logInfo("[Server] Nothing to delete");
+      return false;
+    }
     const res = await Promise.all(
       resourcesToBeRemoved.map((obj) => apiFactory.server.deleteServer(obj.id))
     );
-    return res.findIndex((obj) => obj === false)! != 1;
+    const success = res.findIndex((obj) => obj === false)! != 1;
+    success
+      ? logSuccess("[Server] Successfully deleted all unused resources")
+      : logError("[Server] Failed to delete all unused resources");
+    return success;
   }
 }

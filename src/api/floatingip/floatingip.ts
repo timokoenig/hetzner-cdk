@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import chalk from "chalk";
+import { logDebug } from "../../cdk/utils/logger";
 import client from "../client";
 import { HAction } from "../types/action";
 import {
@@ -66,7 +66,7 @@ export class FloatingIPAPI implements IFloatingIPAPI {
       (!params.description || currentData.description == params.description) &&
       (!params.labels || currentData.labels == params.labels)
     ) {
-      console.log(chalk.gray("[FloatingIP] Nothing to update"));
+      logDebug("[FloatingIP] Nothing to update");
       return currentData;
     }
 

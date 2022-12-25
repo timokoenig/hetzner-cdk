@@ -11,6 +11,7 @@ import { Resource, ResourceChangeset } from "./classes/resource";
 import { Server } from "./classes/server";
 import { SSHKey } from "./classes/sshkey";
 import { formatChangesetTableRow, showError } from "./utils/formatter";
+import { logError, logInfo, logSuccess } from "./utils/logger";
 
 const CDK_VERSION = "0.1.0";
 
@@ -99,42 +100,52 @@ export class CDK implements ICDK {
 
   // Deploy infrastructure
   private async _runDeploy(): Promise<void> {
-    console.log(chalk.green(`Start deployment of ${chalk.bold(this.namespace)}`));
+    logSuccess(`[CDK] Start deployment of ${chalk.bold(this.namespace)}`);
     try {
       // Skip deployment changeset when user enables force option
-      if (process.env.CDK_FORCE == "0") {
+      if (process.env.CDK_FORCE == "1") {
+        logInfo("[CDK] Skip changeset due to --force");
+      } else {
+        logInfo("[CDK] Generate changeset");
+
         const res = await this._generateChangesetDeployment();
         if (!res) return; // do not continue without change
 
         const ok = await yesno({
-          question: chalk.yellow("Do you want to deploy the changes?"),
+          question: chalk.yellow("Do you want to deploy the changes? (y/n)"),
         });
         if (!ok) return;
       }
 
+      logInfo("[CDK] Start applying changes");
       const apiFactory = new APIFactory();
       await Promise.all(this._resources.map((obj) => obj.apply(apiFactory)));
+
+      logInfo("[CDK] Delete unused resources");
       await this._deleteUnusedResources(apiFactory);
 
-      console.log(chalk.green("Deployment complete"));
+      logSuccess("[CDK] Deployment complete");
       await this._showPublicServerIPs();
     } catch (err: unknown) {
-      console.log(chalk.red("Deployment failed"));
+      logError("[CDK] Deployment failed");
       showError(err as Error);
     }
   }
 
   // Destory infrastructure
   private async _runDestroy(all: boolean | undefined): Promise<void> {
+    logSuccess(`[CDK] Start destroying ${chalk.bold(this.namespace)}`);
+
     const apiFactory = new APIFactory();
     let localResources: Resource[] = [];
 
     if (all) {
       // *all* will delete everything within the namespace
       // TODO add implementation
-      console.log(chalk.yellow("Not implemented"));
+      logError("Not implemented");
       process.exit(1);
     } else {
+      logInfo("[CDK] Delete only given resources");
       // Only delete resources from given project
       localResources = this._resources
         .map((obj) => [obj, ...obj.getAttachedResources()])
@@ -156,33 +167,52 @@ export class CDK implements ICDK {
         });
     }
 
+    logInfo("[CDK] Generate changeset");
+
     const res = await this._generateChangesetDestroy(localResources);
-    if (!res) return; // do not continue without change
+    if (!res) {
+      logSuccess("[CDK] Done");
+      return; // do not continue without change
+    }
 
     const ok = await yesno({
-      question: chalk.yellow("Do you want to destroy the resources?"),
+      question: chalk.yellow("Do you want to destroy the resources? (y/n)"),
     });
-    if (!ok) return;
+    if (!ok) {
+      logError("[CDK] Abort");
+      return;
+    }
 
-    await Promise.all(localResources.map((obj) => obj.delete(apiFactory)));
+    logInfo("[CDK] Start deleting resources");
+    for (const localResource of localResources) {
+      await localResource.delete(apiFactory);
+    }
 
-    console.log(chalk.green("Done"));
+    logSuccess("[CDK] Done");
   }
 
   // Show diff of new and existing infrastructure
   private async _runDiff(): Promise<void> {
+    logInfo("[CDK] Generate changeset");
     await this._generateChangesetDeployment();
   }
 
   // Generate changeset for deployment
   private async _generateChangesetDeployment(): Promise<boolean> {
+    // Disable logger for changeset
+    const previousDebugMode = process.env.CDK_DEBUG;
+    process.env.CDK_DEBUG = "0";
+
     // Use APIFactoryChangeset to mock all create/update/delete functions and create changeset entries
     const apiFactoryChangeset = new APIFactoryChangeset(this, new APIFactory());
     await Promise.all(this._resources.map((obj) => obj.apply(apiFactoryChangeset)));
     await this._deleteUnusedResources(apiFactoryChangeset);
 
+    // Reset logger to previous mode
+    process.env.CDK_DEBUG = previousDebugMode;
+
     if (this.changeset.length == 0) {
-      console.log(chalk.green("Heztner Cloud Infrastructure is up-to-date"));
+      logSuccess("[CDK] Heztner Cloud Infrastructure is up-to-date");
       return false;
     }
 
@@ -198,12 +228,19 @@ export class CDK implements ICDK {
 
   // Generate changeset for all resources that are about the get destroyed
   private async _generateChangesetDestroy(localResources: Resource[]): Promise<boolean> {
+    // Disable logger for changeset
+    const previousDebugMode = process.env.CDK_DEBUG;
+    process.env.CDK_DEBUG = "0";
+
     // Use APIFactoryChangeset to mock all create/update/delete functions and create changeset entries
     const apiFactoryChangeset = new APIFactoryChangeset(this, new APIFactory());
     await Promise.all(localResources.map((obj) => obj.delete(apiFactoryChangeset)));
 
+    // Reset logger to previous mode
+    process.env.CDK_DEBUG = previousDebugMode;
+
     if (this.changeset.length == 0) {
-      console.log(chalk.green("Nothing to destroy"));
+      logSuccess("[CDK] Nothing to destroy");
       return false;
     }
 
@@ -219,16 +256,23 @@ export class CDK implements ICDK {
 
   // Enable or disable debug output
   private _enableDebug(debug: boolean | undefined): void {
+    logInfo(`[CDK] ${debug ? "Debug enabled" : "Debug disabled"}`);
     process.env.CDK_DEBUG = debug ? "1" : "0";
+
+    if (!debug) {
+      console.log(chalk.yellow("[CDK] Please wait...\n"));
+    }
   }
 
   // Enable force deployment that disables the users input
   private _enableForce(force: boolean | undefined): void {
+    logInfo(`[CDK] ${force ? "Force enabled" : "Force disabled"}`);
     process.env.CDK_FORCE = force ? "1" : "0";
   }
 
   // Load selected datacenter
   private static async loadDatacenter(name: DATACENTER): Promise<HDatacenter> {
+    logInfo(`[CDK] Load Datacenter ${name}`);
     const allDatacenters = await getAllDatacenters();
     const datacenter = allDatacenters.datacenters.find((obj) => obj.description.includes(name));
     if (!datacenter) throw new Error(`Datacenter '${name}' not found`);
@@ -256,6 +300,8 @@ export class CDK implements ICDK {
 
   // Show all public server IPs
   private async _showPublicServerIPs(): Promise<void> {
+    logInfo(`[CDK] Retrieve public IPs from the server`);
+
     const factory = new APIFactory();
     const servers = await factory.server.getAllServers({
       label_selector: `namespace=${this.namespace}`,

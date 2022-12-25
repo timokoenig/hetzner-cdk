@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import chalk from "chalk";
+import { logDebug } from "../../cdk/utils/logger";
 import client from "../client";
 import {
   HSSHKey,
@@ -51,7 +51,7 @@ export class SSHKeyAPI implements ISSHKeyAPI {
       (!params.name || currentData.name == params.name) &&
       (!params.labels || currentData.labels == params.labels)
     ) {
-      console.log(chalk.gray("[SSHKey] Nothing to update"));
+      logDebug("[SSHKey] Nothing to update");
       return currentData;
     }
 

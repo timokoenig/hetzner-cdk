@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import chalk from "chalk";
+import { logDebug } from "../../cdk/utils/logger";
 import client from "../client";
 import { HAction } from "../types/action";
 import {
@@ -59,7 +59,7 @@ export class ServerAPI implements IServerAPI {
       (!params.name || currentData.name == params.name) &&
       (!params.labels || currentData.labels == params.labels)
     ) {
-      console.log(chalk.gray("[Server] Nothing to update"));
+      logDebug("[Server] Nothing to update");
       return currentData;
     }
 
