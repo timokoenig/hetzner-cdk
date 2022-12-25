@@ -1,3 +1,4 @@
+import axios from "axios";
 import chalk from "chalk";
 import moment from "moment";
 import { APIFactory, IAPIFactory } from "../../api/factory";
@@ -10,10 +11,17 @@ import {
   formatDockerImage,
   resourceNameFormatter,
 } from "../utils/formatter";
+import { sleep } from "../utils/sleep";
 import { FloatingIP } from "./floatingip";
 import { PrimaryIP } from "./primaryip";
 import { Resource } from "./resource";
 import { SSHKey } from "./sshkey";
+
+export type HealthCheck = {
+  url: string;
+  intervalInSeconds: number;
+  statusCode: number;
+};
 
 export type ServerOptions = {
   name: string;
@@ -25,6 +33,7 @@ export type ServerOptions = {
   enableIPv4?: boolean;
   enableIPv6?: boolean;
   protected?: boolean;
+  healthCheck?: HealthCheck;
 };
 
 export class Server implements Resource {
@@ -145,6 +154,28 @@ export class Server implements Resource {
             rebuild: this._options.protected, // currently needs to be the same as `deleted`
           });
         }
+
+        // Wait for service to be healthy
+        if (this._options.healthCheck) {
+          console.log(
+            chalk.yellow(
+              `[Server] Run health check for ${this._options.healthCheck.url}`
+            )
+          );
+          try {
+            await this._waitForServerToBeHealthy(
+              this._options.healthCheck,
+              moment()
+            );
+            console.log(chalk.green("[Server] Service is health"));
+          } catch (error: unknown) {
+            console.log(chalk.red(error));
+            console.log(chalk.red("[Server] Service is unhealthy"));
+            // TODO in the future we might want to trigger a rollback at this point
+          }
+        } else {
+          console.log(chalk.gray("[Server] Skip health check"));
+        }
       }
 
       return res.id;
@@ -161,7 +192,21 @@ export class Server implements Resource {
       throw new Error("Server is not running");
     const res = await apiFactory.server.getServer(id);
     if (res.status == HServerStatus.RUNNING) return;
+    await sleep(5); // Sleep for 5 seconds to avoid spamming the API
     await this._waitForServerToBeReady(apiFactory, id, createdAt);
+  }
+
+  // Run health check until service is up and running or timeout is reached
+  private async _waitForServerToBeHealthy(
+    healthCheck: HealthCheck,
+    createdAt: moment.Moment
+  ): Promise<void> {
+    if (moment() > createdAt.add(Server.WAIT_TIMEOUT_SECONDS, "seconds"))
+      throw new Error("Server is unhealthy");
+    const res = await axios.get(healthCheck.url);
+    if (res.status == healthCheck.statusCode) return;
+    await sleep(healthCheck.intervalInSeconds);
+    await this._waitForServerToBeHealthy(healthCheck, createdAt);
   }
 
   // Request server status until server is deleted or timeout is reached
@@ -174,6 +219,7 @@ export class Server implements Resource {
       throw new Error("Server is still running");
     try {
       await apiFactory.server.getServer(id);
+      await sleep(5); // Sleep for 5 seconds to avoid spamming the API
       await this._waitForServerToBeDeleted(apiFactory, id, createdAt);
     } catch {
       // Server does not exist anymore
