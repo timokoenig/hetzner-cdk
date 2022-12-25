@@ -8,6 +8,9 @@
   "main": "dist/hetzner-cdk.cjs",
   "module": "dist/hetzner-cdk.mjs",
   "typings": "dist/hetzner-cdk.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsc-watch",
     "build": "rollup -c",
