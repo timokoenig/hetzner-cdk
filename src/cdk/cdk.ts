@@ -14,7 +14,7 @@ import { formatChangesetTableRow, showError } from "./utils/formatter";
 
 const CDK_VERSION = "0.1.0";
 
-const ALL_AVAILABLE_RESOURCES = [Server, SSHKey, PrimaryIP, FloatingIP];
+const ALL_AVAILABLE_RESOURCES = [PrimaryIP, FloatingIP, Server, SSHKey];
 
 export enum CDKMode {
   DIFF,
@@ -140,7 +140,22 @@ export class CDK implements ICDK {
       // Only delete resources from given project
       localResources = this._resources
         .map((obj) => [obj, ...obj.getAttachedResources()])
-        .flatMap((obj) => obj);
+        .flatMap((obj) => obj)
+        .sort((a, b) => {
+          // Delete FloatingIP after Server
+          if (a instanceof Server && b instanceof FloatingIP) {
+            return -1;
+          }
+          // Delete PrimaryIP after Server
+          if (a instanceof Server && b instanceof PrimaryIP) {
+            return -1;
+          }
+          // Delete SSHKey after Server
+          if (a instanceof Server && b instanceof SSHKey) {
+            return -1;
+          }
+          return 0;
+        });
     }
 
     const res = await this._generateChangesetDestroy(localResources);
@@ -151,17 +166,7 @@ export class CDK implements ICDK {
     });
     if (!ok) return;
 
-    // First delete servers and ssh keys
-    const otherResources = localResources.filter(
-      (obj) => !(obj instanceof FloatingIP) && !(obj instanceof PrimaryIP)
-    );
-    await Promise.all(otherResources.map((obj) => obj.delete(apiFactory)));
-
-    // Then delete the IPs
-    const ipResources = localResources.filter(
-      (obj) => obj instanceof FloatingIP || obj instanceof PrimaryIP
-    );
-    await Promise.all(ipResources.map((obj) => obj.delete(apiFactory)));
+    await Promise.all(localResources.map((obj) => obj.delete(apiFactory)));
 
     console.log(chalk.green("Done"));
   }

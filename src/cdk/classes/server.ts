@@ -18,7 +18,6 @@ import { Resource } from "./resource";
 import { SSHKey } from "./sshkey";
 
 export type HealthCheck = {
-  url: string;
   intervalInSeconds: number;
   statusCode: number;
 };
@@ -157,21 +156,24 @@ export class Server implements Resource {
 
         // Wait for service to be healthy
         if (this._options.healthCheck) {
-          console.log(
-            chalk.yellow(
-              `[Server] Run health check for ${this._options.healthCheck.url}`
-            )
-          );
-          try {
-            await this._waitForServerToBeHealthy(
-              this._options.healthCheck,
-              moment()
-            );
-            console.log(chalk.green("[Server] Service is health"));
-          } catch (error: unknown) {
-            console.log(chalk.red(error));
-            console.log(chalk.red("[Server] Service is unhealthy"));
-            // TODO in the future we might want to trigger a rollback at this point
+          const ip = res.public_net.ipv4?.ip;
+          if (ip) {
+            const url = `http://${ip}`;
+            console.log(chalk.yellow(`[Server] Run health check for ${url}`));
+            try {
+              await this._waitForServerToBeHealthy(
+                url,
+                this._options.healthCheck,
+                moment()
+              );
+              console.log(chalk.green("[Server] Service is healthy"));
+            } catch (error: unknown) {
+              console.log(chalk.red(error));
+              console.log(chalk.red("[Server] Service is unhealthy"));
+              // TODO in the future we might want to trigger a rollback at this point
+            }
+          } else {
+            console.log("[Server] Skip health check; missing ip");
           }
         } else {
           console.log(chalk.gray("[Server] Skip health check"));
@@ -198,15 +200,20 @@ export class Server implements Resource {
 
   // Run health check until service is up and running or timeout is reached
   private async _waitForServerToBeHealthy(
+    url: string,
     healthCheck: HealthCheck,
     createdAt: moment.Moment
   ): Promise<void> {
     if (moment() > createdAt.add(Server.WAIT_TIMEOUT_SECONDS, "seconds"))
       throw new Error("Server is unhealthy");
-    const res = await axios.get(healthCheck.url);
-    if (res.status == healthCheck.statusCode) return;
+    try {
+      const res = await axios.get(url);
+      if (res.status == healthCheck.statusCode) return;
+    } catch {
+      // Ignore the error, this is the case as long as the service is not running
+    }
     await sleep(healthCheck.intervalInSeconds);
-    await this._waitForServerToBeHealthy(healthCheck, createdAt);
+    await this._waitForServerToBeHealthy(url, healthCheck, createdAt);
   }
 
   // Request server status until server is deleted or timeout is reached
@@ -242,6 +249,9 @@ export class Server implements Resource {
     }
     const res = await apiFactory.server.deleteServer(server.id);
     if (!res) return false;
+
+    // Sleep for 5 seconds because the original wait sometimes does not work properly
+    await sleep(5);
 
     // Wait until server has been deleted
     if (apiFactory instanceof APIFactory) {
