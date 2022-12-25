@@ -20,6 +20,11 @@ const server = new Server({
     name: "spaceserver",
     image: "ubuntu-20.04",
     serverType: "cx11",
+    dockerImage: "docker.io/library/httpd",
+    healthCheck: {
+      intervalInSeconds: 5,
+      statusCode: 200,
+    },
 });
 cdk.add(server);
 
@@ -72,8 +77,3 @@ server.addFloatingIP(ipv4)
 ### Options
 
 In some cases you might want to deploy your stack to hetzner without getting the users confirmation. In that case you can append the `--force` option to the deploy command.
-
-## TODOs
-- [ ] Implement pagination for all requests
-- [ ] Add option to either destroy only given resources or everything within the namespace
-- [ ] Improve axios error handling
