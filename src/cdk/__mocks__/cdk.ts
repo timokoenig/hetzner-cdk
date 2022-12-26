@@ -9,5 +9,14 @@ export class CDKMock implements ICDK {
   datacenter: HDatacenter = HDatacenterMock;
   changeset: ResourceChangeset[] = [];
   run(): void {}
+  runDiff(options?: { debug?: boolean }): Promise<void> {
+    return Promise.resolve();
+  }
+  runDeploy(options?: { debug?: boolean; force?: boolean }): Promise<void> {
+    return Promise.resolve();
+  }
+  runDestroy(options?: { debug?: boolean; all?: boolean }): Promise<void> {
+    return Promise.resolve();
+  }
   add(_: Resource): void {}
 }

@@ -28,6 +28,9 @@ export interface ICDK {
   datacenter: HDatacenter;
   changeset: ResourceChangeset[];
   run(): void;
+  runDiff(options?: { debug?: boolean }): Promise<void>;
+  runDeploy(options?: { debug?: boolean; force?: boolean }): Promise<void>;
+  runDestroy(options?: { debug?: boolean; all?: boolean }): Promise<void>;
   add(resource: Resource): void;
 }
 
@@ -64,32 +67,42 @@ export class CDK implements ICDK {
       .description("deploy infrastructure")
       .option("--debug", "enable debug output")
       .option("--force", "force deployment without users confirmation")
-      .action((options: { debug?: boolean; force?: boolean }) => {
-        this._enableDebug(options.debug);
-        this._enableForce(options.force);
-        this._runDeploy().catch(showError);
-      });
+      .action((options: { debug?: boolean; force?: boolean }) =>
+        this.runDeploy(options).catch(showError)
+      );
 
     program
       .command("destroy")
       .description("destroy infrastructure")
       .option("--all", "delete everything within the namespace")
       .option("--debug", "enable debug output")
-      .action((options: { all?: boolean; debug?: boolean }) => {
-        this._enableDebug(options.debug);
-        this._runDestroy(options.all).catch(showError);
-      });
+      .action((options: { all?: boolean; debug?: boolean }) =>
+        this.runDestroy(options).catch(showError)
+      );
 
     program
       .command("diff")
       .description("show diff of new and existing infrastructure")
       .option("--debug", "enable debug output")
-      .action((options: { debug?: boolean }) => {
-        this._enableDebug(options.debug);
-        this._runDiff().catch(showError);
-      });
+      .action((options: { debug?: boolean }) => this.runDiff(options).catch(showError));
 
     program.parse();
+  }
+
+  runDiff(options?: { debug?: boolean }): Promise<void> {
+    this._enableDebug(options?.debug);
+    return this._runDiff();
+  }
+
+  runDeploy(options?: { debug?: boolean; force?: boolean }): Promise<void> {
+    this._enableDebug(options?.debug);
+    this._enableForce(options?.force);
+    return this._runDeploy();
+  }
+
+  runDestroy(options?: { debug?: boolean; all?: boolean }): Promise<void> {
+    this._enableDebug(options?.debug);
+    return this._runDestroy(options?.all);
   }
 
   // Add resource to cdk
