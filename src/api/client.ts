@@ -4,7 +4,7 @@ import { logDebug, logError } from "../cdk/utils/logger";
 
 dotenv.config();
 
-const authToken = process.env.NODE_ENV === "test" ? "-" : process.env.HETZNER_AUTH_TOKEN;
+const authToken = process.env.HETZNER_AUTH_TOKEN;
 if (!authToken) {
   logError(`Missing environment variable 'HETZNER_AUTH_TOKEN'`);
   process.exit(1);
