@@ -1,7 +1,7 @@
 import { HDatacenter } from "../../api/types/datacenter";
 import { HDatacenterMock } from "../../api/types/__mocks__/datacenter-mock";
 import { CDKMode, ICDK } from "../cdk";
-import { Resource, ResourceChangeset } from "../classes/resource";
+import { Resource, ResourceChangeset } from "../resource/resource";
 
 export class CDKMock implements ICDK {
   mode: CDKMode = CDKMode.DIFF;

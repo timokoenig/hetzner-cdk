@@ -1,6 +1,6 @@
 import axios from "axios";
 import chalk from "chalk";
-import { Operation, ResourceChangeset } from "../classes/resource";
+import { Operation, ResourceChangeset } from "../resource/resource";
 import { logError } from "./logger";
 
 // Convert changeset to table row

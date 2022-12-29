@@ -5,11 +5,11 @@ import yesno from "yesno";
 import { getAllDatacenters } from "../api/datacenter/datacenter";
 import { APIFactory, APIFactoryChangeset, IAPIFactory } from "../api/factory";
 import { DATACENTER, HDatacenter } from "../api/types/datacenter";
-import { FloatingIP } from "./classes/floatingip";
-import { PrimaryIP } from "./classes/primaryip";
-import { Resource, ResourceChangeset } from "./classes/resource";
-import { Server } from "./classes/server";
-import { SSHKey } from "./classes/sshkey";
+import { FloatingIP } from "./resource/floatingip";
+import { PrimaryIP } from "./resource/primaryip";
+import { Resource, ResourceChangeset } from "./resource/resource";
+import { Server } from "./resource/server";
+import { SSHKey } from "./resource/sshkey";
 import { formatChangesetTableRow, showError } from "./utils/formatter";
 import { logError, logInfo, logSuccess } from "./utils/logger";
 

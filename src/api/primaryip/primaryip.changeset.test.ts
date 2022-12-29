@@ -1,5 +1,5 @@
 import { ICDK } from "../../cdk/cdk";
-import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { Operation, ResourceType } from "../../cdk/resource/resource";
 import { CDKMock } from "../../cdk/__mocks__/cdk";
 import { HIPType } from "../types/floatingip";
 import { HAssigneeType } from "../types/primaryip";

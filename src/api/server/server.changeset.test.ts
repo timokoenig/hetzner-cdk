@@ -1,5 +1,5 @@
 import { ICDK } from "../../cdk/cdk";
-import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { Operation, ResourceType } from "../../cdk/resource/resource";
 import { CDKMock } from "../../cdk/__mocks__/cdk";
 import { HActionMock } from "../types/__mocks__/action-mock";
 import { HServerMock } from "../types/__mocks__/server-mock";

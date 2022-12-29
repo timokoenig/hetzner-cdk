@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { Operation } from "../classes/resource";
+import { Operation } from "../resource/resource";
 import {
   extractDockerImageVersion,
   formatChangesetTableRow,

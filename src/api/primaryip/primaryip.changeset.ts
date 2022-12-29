@@ -1,5 +1,5 @@
 import { ICDK } from "../../cdk/cdk";
-import { Operation, ResourceType } from "../../cdk/classes/resource";
+import { Operation, ResourceType } from "../../cdk/resource/resource";
 import { HAction } from "../types/action";
 import {
   HPrimaryIP,
