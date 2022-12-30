@@ -77,4 +77,74 @@ describe("Server", () => {
       expect(res).toBeFalsy();
     });
   });
+  describe("import & export", () => {
+    test("succeeds without attached resources", async () => {
+      // Given
+      const data = {
+        name: "server",
+        image: "ubuntu-22.04",
+        serverType: "cx11",
+        resourceType: "Server",
+        attachedResources: [],
+      };
+
+      // When Import
+      const sut = await Server.import(new CDKMock(), data);
+
+      // Then
+      expect(sut.getName()).toBe("mock-server");
+
+      // When Export
+      const res = await sut.export();
+
+      // Then
+      expect(res).toEqual({
+        name: "server",
+        image: "ubuntu-22.04",
+        serverType: "cx11",
+        resourceType: "Server",
+        attachedResources: [],
+      });
+    });
+    test("succeeds with attached resources", async () => {
+      // Given
+      const data = {
+        name: "server",
+        image: "ubuntu-22.04",
+        serverType: "cx11",
+        resourceType: "Server",
+        attachedResources: [
+          {
+            name: "primaryip",
+            resourceType: "PrimaryIP",
+            type: "ipv4",
+          },
+        ],
+      };
+
+      // When Import
+      const sut = await Server.import(new CDKMock(), data);
+
+      // Then
+      expect(sut.getName()).toBe("mock-server");
+
+      // When Export
+      const res = await sut.export();
+
+      // Then
+      expect(res).toEqual({
+        name: "server",
+        image: "ubuntu-22.04",
+        serverType: "cx11",
+        resourceType: "Server",
+        attachedResources: [
+          {
+            name: "primaryip",
+            resourceType: "PrimaryIP",
+            type: "ipv4",
+          },
+        ],
+      });
+    });
+  });
 });

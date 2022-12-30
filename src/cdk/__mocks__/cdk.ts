@@ -19,4 +19,7 @@ export class CDKMock implements ICDK {
     return Promise.resolve();
   }
   add(_: Resource): void {}
+  async export(): Promise<string> {
+    return "";
+  }
 }

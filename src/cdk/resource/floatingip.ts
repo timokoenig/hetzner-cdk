@@ -127,4 +127,17 @@ export class FloatingIP implements Resource {
 
     return success;
   }
+
+  async export(): Promise<object> {
+    return {
+      resourceType: "FloatingIP",
+      ...this._options,
+    };
+  }
+
+  static async import(cdk: ICDK, data: any): Promise<FloatingIP> {
+    const floatingIP = new FloatingIP(data);
+    floatingIP.cdk = cdk;
+    return floatingIP;
+  }
 }

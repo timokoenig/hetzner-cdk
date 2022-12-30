@@ -78,4 +78,30 @@ describe("PrimaryIP", () => {
       expect(res).toBeFalsy();
     });
   });
+  describe("import & export", () => {
+    test("succeeds", async () => {
+      // Given
+      const data = {
+        name: "primaryip",
+        resourceType: "PrimaryIP",
+        type: "ipv4",
+      };
+
+      // When Import
+      const sut = await PrimaryIP.import(new CDKMock(), data);
+
+      // Then
+      expect(sut.getName()).toBe("mock-primaryip");
+
+      // When Export
+      const res = await sut.export();
+
+      // Then
+      expect(res).toEqual({
+        name: "primaryip",
+        resourceType: "PrimaryIP",
+        type: "ipv4",
+      });
+    });
+  });
 });

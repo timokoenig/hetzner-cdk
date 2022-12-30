@@ -308,4 +308,43 @@ export class Server implements Resource {
       : logError("[Server] Failed to delete all unused resources");
     return success;
   }
+
+  async export(): Promise<object> {
+    let attachedResources = [];
+    if (this._sshKey) {
+      attachedResources.push(await this._sshKey.export());
+    }
+    if (this._floatingIPs) {
+      attachedResources.push(
+        ...(await Promise.all(this._floatingIPs.map((resource) => resource.export())))
+      );
+    }
+    if (this._primaryIPs) {
+      attachedResources.push(
+        ...(await Promise.all(this._primaryIPs.map((resource) => resource.export())))
+      );
+    }
+    return {
+      resourceType: "Server",
+      ...this._options,
+      attachedResources,
+    };
+  }
+
+  static async import(cdk: ICDK, data: any): Promise<Server> {
+    const server = new Server(data);
+    server.cdk = cdk;
+    for (const attachedResource of data.attachedResources) {
+      if (attachedResource.resourceType === "SSHKey") {
+        server.addSSHKey(await SSHKey.import(cdk, attachedResource));
+      } else if (attachedResource.resourceType === "PrimaryIP") {
+        server.addPrimaryIP(await PrimaryIP.import(cdk, attachedResource));
+      } else if (attachedResource.resourceType === "FloatingIP") {
+        server.addFloatingIP(await FloatingIP.import(cdk, attachedResource));
+      } else {
+        throw new Error("[Server] Unsupported resource type");
+      }
+    }
+    return server;
+  }
 }

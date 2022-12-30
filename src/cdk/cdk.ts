@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import Table from "cli-table";
 import { program } from "commander";
+import * as yaml from "yaml";
 import yesno from "yesno";
 import { getAllDatacenters } from "../api/datacenter/datacenter";
 import { APIFactory, APIFactoryChangeset, IAPIFactory } from "../api/factory";
@@ -32,6 +33,7 @@ export interface ICDK {
   runDeploy(options?: { debug?: boolean; force?: boolean }): Promise<void>;
   runDestroy(options?: { debug?: boolean; all?: boolean }): Promise<void>;
   add(resource: Resource): void;
+  export(): Promise<string>;
 }
 
 type Config = {
@@ -43,17 +45,19 @@ export class CDK implements ICDK {
   private _resources: Resource[] = [];
   mode: CDKMode = CDKMode.DIFF;
   namespace: string;
+  datacenterName: string;
   datacenter: HDatacenter;
   changeset: ResourceChangeset[] = [];
 
-  private constructor(namespace: string, datacenter: HDatacenter) {
+  private constructor(namespace: string, datacenterName: string, datacenter: HDatacenter) {
     this.namespace = namespace;
+    this.datacenterName = datacenterName;
     this.datacenter = datacenter;
   }
 
   static async init(config: Config): Promise<CDK> {
     const datacenter = await CDK.loadDatacenter(config.datacenter);
-    return new CDK(config.namespace, datacenter);
+    return new CDK(config.namespace, config.datacenter, datacenter);
   }
 
   run(): void {
@@ -109,6 +113,41 @@ export class CDK implements ICDK {
   add(resource: Resource): void {
     resource.cdk = this;
     this._resources.push(resource);
+  }
+
+  static async import(template: string): Promise<CDK> {
+    const obj = yaml.parse(template);
+    if (obj.version !== "0.1.0") throw new Error("Unsupported template version");
+    const cdk = await CDK.init({
+      namespace: obj.namespace,
+      datacenter: obj.datacenter,
+    });
+    cdk._resources = await Promise.all(
+      obj.resources.map((resource: any) => {
+        if (resource.resourceType === "Server") {
+          return Server.import(cdk, resource);
+        } else if (resource.resourceType === "SSHKey") {
+          return SSHKey.import(cdk, resource);
+        } else if (resource.resourceType === "PrimaryIP") {
+          return PrimaryIP.import(cdk, resource);
+        } else if (resource.resourceType === "FloatingIP") {
+          return FloatingIP.import(cdk, resource);
+        } else {
+          throw new Error("[CDK] Unsupported resource type");
+        }
+      })
+    );
+    return cdk;
+  }
+
+  async export(): Promise<string> {
+    const resources = await Promise.all(this._resources.map((resource) => resource.export()));
+    return yaml.stringify({
+      version: "0.1.0",
+      namespace: this.namespace,
+      datacenter: this.datacenterName,
+      resources,
+    });
   }
 
   // Deploy infrastructure

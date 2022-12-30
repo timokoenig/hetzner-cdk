@@ -78,4 +78,30 @@ describe("FloatingIP", () => {
       expect(res).toBeFalsy();
     });
   });
+  describe("import & export", () => {
+    test("succeeds", async () => {
+      // Given
+      const data = {
+        name: "floatingip",
+        resourceType: "FloatingIP",
+        type: "ipv4",
+      };
+
+      // When Import
+      const sut = await FloatingIP.import(new CDKMock(), data);
+
+      // Then
+      expect(sut.getName()).toBe("mock-floatingip");
+
+      // When Export
+      const res = await sut.export();
+
+      // Then
+      expect(res).toEqual({
+        name: "floatingip",
+        resourceType: "FloatingIP",
+        type: "ipv4",
+      });
+    });
+  });
 });

@@ -28,4 +28,5 @@ export interface Resource {
   getAttachedResources(): Resource[];
   apply(apiFactory: IAPIFactory): Promise<number>;
   delete(apiFactory: IAPIFactory): Promise<boolean>;
+  export(): Promise<object>;
 }

@@ -74,4 +74,34 @@ describe("SSHKey", () => {
       expect(res).toBeFalsy();
     });
   });
+  describe("import & export", () => {
+    test("succeeds", async () => {
+      // Given
+      const data = {
+        name: "key",
+        resourceType: "SSHKey",
+        publicKey: {
+          key: "",
+        },
+      };
+
+      // When Import
+      const sut = await SSHKey.import(new CDKMock(), data);
+
+      // Then
+      expect(sut.getName()).toBe("mock-key");
+
+      // When Export
+      const res = await sut.export();
+
+      // Then
+      expect(res).toEqual({
+        name: "key",
+        resourceType: "SSHKey",
+        publicKey: {
+          key: "",
+        },
+      });
+    });
+  });
 });

@@ -102,4 +102,17 @@ export class SSHKey implements Resource {
       : logError("[SSHKey] Failed to delete all unused resources");
     return success;
   }
+
+  async export(): Promise<object> {
+    return {
+      resourceType: "SSHKey",
+      ...this._options,
+    };
+  }
+
+  static async import(cdk: ICDK, data: any): Promise<SSHKey> {
+    const sshkey = new SSHKey(data);
+    sshkey.cdk = cdk;
+    return sshkey;
+  }
 }

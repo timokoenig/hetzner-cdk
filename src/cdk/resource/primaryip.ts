@@ -128,4 +128,17 @@ export class PrimaryIP implements Resource {
       : logError("[PrimaryIP] Failed to delete all unused resources");
     return success;
   }
+
+  async export(): Promise<object> {
+    return {
+      resourceType: "PrimaryIP",
+      ...this._options,
+    };
+  }
+
+  static async import(cdk: ICDK, data: any): Promise<PrimaryIP> {
+    const primaryIP = new PrimaryIP(data);
+    primaryIP.cdk = cdk;
+    return primaryIP;
+  }
 }
