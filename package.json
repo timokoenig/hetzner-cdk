@@ -1,6 +1,6 @@
 {
   "name": "hetzner-cdk",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Hetzner Cloud Development Kit",
   "author": "Timo Koenig <timo@timokoenig.com>",
   "license": "MIT",
