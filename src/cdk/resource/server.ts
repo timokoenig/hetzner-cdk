@@ -22,6 +22,11 @@ export type HealthCheck = {
   statusCode: number;
 };
 
+export type SSLConfiguration = {
+  host: string;
+  letsEncryptEmail: string;
+};
+
 export type ServerOptions = {
   name: string;
   image: string;
@@ -29,6 +34,8 @@ export type ServerOptions = {
   serverType: string;
   userData?: string;
   dockerImage?: string;
+  dockerPort?: string;
+  ssl?: SSLConfiguration;
   enableIPv4?: boolean;
   enableIPv6?: boolean;
   protected?: boolean;
@@ -108,7 +115,7 @@ export class Server implements Resource {
       } else {
         const dockerImage = formatDockerImage(this._options.dockerImage);
         logInfo(`[Server] Use default cloud config with docker image '${dockerImage}'`);
-        cloudConfig = defaultCloudConfig(dockerImage);
+        cloudConfig = defaultCloudConfig(this._options);
 
         // Save docker image version as server label so we can identify later if we need to restart
         // the server to run a new version of the given docker image

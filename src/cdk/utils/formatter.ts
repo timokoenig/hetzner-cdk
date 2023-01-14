@@ -41,14 +41,12 @@ export function formatChangesetTableRow(changeset: ResourceChangeset): string[] 
 // Print error message
 export function showError(err: Error): void {
   logError("An error occurred");
-  logError(`${err}`);
   if (axios.isAxiosError(err)) {
     if (err.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
       logError(err.response.data);
       logError(`${err.response.status}`);
-      logError(`${err.response.headers}`);
     } else if (err.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -58,6 +56,8 @@ export function showError(err: Error): void {
       // Something happened in setting up the request that triggered an Error
       logError(`Error ${err.message}`);
     }
+  } else {
+    logError(`${err}`);
   }
 }
 

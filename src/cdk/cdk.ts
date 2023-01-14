@@ -56,8 +56,13 @@ export class CDK implements ICDK {
   }
 
   static async init(config: Config): Promise<CDK> {
-    const datacenter = await CDK.loadDatacenter(config.datacenter);
-    return new CDK(config.namespace, config.datacenter, datacenter);
+    try {
+      const datacenter = await CDK.loadDatacenter(config.datacenter);
+      return new CDK(config.namespace, config.datacenter, datacenter);
+    } catch (err: unknown) {
+      showError(err as Error);
+      throw new Error("Failed to load datacenter");
+    }
   }
 
   run(): void {
