@@ -78,6 +78,10 @@ server.addFloatingIP(ipv4)
 
 In some cases you might want to deploy your stack to hetzner without getting the users confirmation. In that case you can append the `--force` option to the deploy command.
 
+## Server Configuration
+
+By default every server will run in addition to the given docker image, an [nginx proxy](https://github.com/nginx-proxy/nginx-proxy) and the [nginx proxy acme companion](https://github.com/nginx-proxy/acme-companion) to issue a LetsEncrypt SSL certificate. After you deploy your server, the CDK will give you the public IP which you will need to add as an A record entry in the DNS settings of your server. The acme companion will check for that record every hour and issue the SSL certificate as soon as it is available.
+
 ## Export Cloud Template
 
 You can export the cloud configuration into a yaml template and then import it later without recreating the cloud resources. Simply define your cloud resources and then call `const template = await cdk.export()` instead of `cdk.run()`. The function will return the yaml template that you can import later with `await CDK.import(template)`.
