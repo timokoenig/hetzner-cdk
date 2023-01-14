@@ -77,3 +77,11 @@ server.addFloatingIP(ipv4)
 ### Options
 
 In some cases you might want to deploy your stack to hetzner without getting the users confirmation. In that case you can append the `--force` option to the deploy command.
+
+## Export Cloud Template
+
+You can export the cloud configuration into a yaml template and then import it later without recreating the cloud resources. Simply define your cloud resources and then call `const template = await cdk.export()` instead of `cdk.run()`. The function will return the yaml template that you can import later with `await CDK.import(template)`.
+
+## Examples
+
+CDK examples can be found in the [examples folder](./examples).
