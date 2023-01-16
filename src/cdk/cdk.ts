@@ -186,6 +186,7 @@ export class CDK implements ICDK {
     } catch (err: unknown) {
       logError("[CDK] Deployment failed");
       showError(err as Error);
+      throw err;
     }
   }
 
