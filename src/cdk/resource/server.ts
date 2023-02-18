@@ -2,6 +2,7 @@ import axios from "axios";
 import moment from "moment";
 import { APIFactory, IAPIFactory } from "../../api/factory";
 import { HIPType } from "../../api/types/floatingip";
+import { HPrimaryIP } from "../../api/types/primaryip";
 import { HServerStatus } from "../../api/types/server";
 import { ICDK } from "../cdk";
 import { defaultCloudConfig } from "../utils/cloudconfig";
@@ -10,7 +11,7 @@ import {
   formatDockerImage,
   resourceNameFormatter,
 } from "../utils/formatter";
-import { logError, logInfo, logSuccess } from "../utils/logger";
+import { logDebug, logError, logInfo, logSuccess } from "../utils/logger";
 import { sleep } from "../utils/sleep";
 import { FloatingIP } from "./floatingip";
 import { PrimaryIP } from "./primaryip";
@@ -131,78 +132,111 @@ export class Server implements Resource {
     const server = allServers.find((obj) => obj.name == this.getName());
     if (server) {
       // Server already exists; check for updates
-      logInfo("[Server] Update existing Server");
-      const res = await apiFactory.server.updateServer(server.id, {
-        labels,
-        name: this.getName(),
-      });
-      logSuccess("[Server] Successfully updated the existing Server");
-      return res.id;
+      if (
+        labels.dockerImageVersion == "latest" ||
+        labels.dockerImageVersion != server.labels.dockerImageVersion
+      ) {
+        // Update server in case of "latest" or an updated docker version
+        logInfo("[Server] Redeploy existing Server with new docker image");
+        logDebug(`[Server] Old Image Version: ${server.labels.dockerImageVersion}`);
+        logDebug(`[Server] New Image Version: ${labels.dockerImageVersion}`);
+        // Delete old instance
+        const deleteSuccessful = await this.delete(apiFactory);
+        if (!deleteSuccessful) {
+          // Abort redeployment
+          logError("[Server] Failed to delete server; abort redeployment");
+          throw new Error("Abort redeployment");
+        }
+        // Then create new instance
+        const id = await this._createNewServer(apiFactory, labels, primaryIPs, sshkey, cloudConfig);
+        logSuccess("[Server] Successfully redeployed the Server");
+        return id;
+      } else {
+        // In this case we only update the server itself
+        logInfo("[Server] Update existing Server");
+        const res = await apiFactory.server.updateServer(server.id, {
+          labels,
+          name: this.getName(),
+        });
+        logSuccess("[Server] Successfully updated the existing Server");
+        return res.id;
+      }
     } else {
       // Server does not exist; create new server
-      logInfo("[Server] Create new Server");
-      const res = await apiFactory.server.createServer({
-        automount: false,
-        datacenter: this.cdk?.datacenter.id.toString(),
-        firewalls: undefined,
-        image: this._options.image,
-        labels,
-        name: this.getName(),
-        networks: undefined,
-        placement_group: undefined,
-        public_net: {
-          enable_ipv4: this._options.enableIPv4 ?? true,
-          enable_ipv6: this._options.enableIPv6 ?? false,
-          ipv4: primaryIPs.find((obj) => obj.type == HIPType.IPV4)?.id,
-          ipv6: primaryIPs.find((obj) => obj.type == HIPType.IPV6)?.id,
-        },
-        server_type: this._options.serverType,
-        ssh_keys: sshkey ? [sshkey] : [],
-        start_after_create: true,
-        user_data: cloudConfig,
-        volumes: [],
-      });
-      logSuccess("[Server] Successfully created a new Server");
+      return this._createNewServer(apiFactory, labels, primaryIPs, sshkey, cloudConfig);
+    }
+  }
 
-      if (apiFactory instanceof APIFactory) {
-        // Wait until server is running
-        logInfo("[Server] Wait until new server is running");
-        const createdAt = moment();
-        await this._waitForServerToBeReady(apiFactory, res.id, createdAt);
-        logSuccess(`[Server] Server ${res.name} is running`);
+  // Create new Server
+  private async _createNewServer(
+    apiFactory: IAPIFactory,
+    labels: { [key: string]: string },
+    primaryIPs: HPrimaryIP[],
+    sshkey: number | undefined,
+    cloudConfig: string | undefined
+  ): Promise<number> {
+    logInfo("[Server] Create new Server");
+    const res = await apiFactory.server.createServer({
+      automount: false,
+      datacenter: this.cdk?.datacenter.id.toString(),
+      firewalls: undefined,
+      image: this._options.image,
+      labels,
+      name: this.getName(),
+      networks: undefined,
+      placement_group: undefined,
+      public_net: {
+        enable_ipv4: this._options.enableIPv4 ?? true,
+        enable_ipv6: this._options.enableIPv6 ?? false,
+        ipv4: primaryIPs.find((obj) => obj.type == HIPType.IPV4)?.id,
+        ipv6: primaryIPs.find((obj) => obj.type == HIPType.IPV6)?.id,
+      },
+      server_type: this._options.serverType,
+      ssh_keys: sshkey ? [sshkey] : [],
+      start_after_create: true,
+      user_data: cloudConfig,
+      volumes: [],
+    });
+    logSuccess("[Server] Successfully created a new Server");
 
-        // Update Server protection
-        if (this._options.protected !== undefined) {
-          await apiFactory.server.changeProtection(res.id, {
-            delete: this._options.protected,
-            rebuild: this._options.protected, // currently needs to be the same as `deleted`
-          });
-        }
+    if (apiFactory instanceof APIFactory) {
+      // Wait until server is running
+      logInfo("[Server] Wait until new server is running");
+      const createdAt = moment();
+      await this._waitForServerToBeReady(apiFactory, res.id, createdAt);
+      logSuccess(`[Server] Server ${res.name} is running`);
 
-        // Wait for service to be healthy
-        if (this._options.healthCheck) {
-          const ip = res.public_net.ipv4?.ip;
-          if (ip) {
-            const url = `http://${ip}`;
-            logInfo(`[Server] Run health check for ${url}`);
-            try {
-              await this._waitForServerToBeHealthy(url, this._options.healthCheck, moment());
-              logSuccess("[Server] Service is healthy");
-            } catch (error: unknown) {
-              logError("[Server] Service is unhealthy");
-              logError(`${error}`);
-              // TODO in the future we might want to trigger a rollback at this point
-            }
-          } else {
-            logInfo("[Server] Skip health check; missing ip");
-          }
-        } else {
-          logInfo("[Server] Skip health check");
-        }
+      // Update Server protection
+      if (this._options.protected !== undefined) {
+        await apiFactory.server.changeProtection(res.id, {
+          delete: this._options.protected,
+          rebuild: this._options.protected, // currently needs to be the same as `deleted`
+        });
       }
 
-      return res.id;
+      // Wait for service to be healthy
+      if (this._options.healthCheck) {
+        const ip = res.public_net.ipv4?.ip;
+        if (ip) {
+          const url = `http://${ip}`;
+          logInfo(`[Server] Run health check for ${url}`);
+          try {
+            await this._waitForServerToBeHealthy(url, this._options.healthCheck, moment());
+            logSuccess("[Server] Service is healthy");
+          } catch (error: unknown) {
+            logError("[Server] Service is unhealthy");
+            logError(`${error}`);
+            // TODO in the future we might want to trigger a rollback at this point
+          }
+        } else {
+          logInfo("[Server] Skip health check; missing ip");
+        }
+      } else {
+        logInfo("[Server] Skip health check");
+      }
     }
+
+    return res.id;
   }
 
   // Request server status until server is running or timeout is reached
