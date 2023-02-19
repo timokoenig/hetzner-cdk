@@ -20,7 +20,7 @@
   "dependencies": {
     "@types/node": "^18.11.10",
     "axios": "^1.2.0",
-    "chalk": "^4.1.2",
+    "chalk": "^5.2.0",
     "cli-table": "^0.3.11",
     "commander": "^10.0.0",
     "dotenv": "^16.0.3",
