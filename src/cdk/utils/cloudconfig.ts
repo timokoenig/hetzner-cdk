@@ -57,24 +57,34 @@ volumes:
 
 export function defaultCloudConfig(options: ServerOptions): string {
   const dockerComposeData = createDockerComposeData(options);
+  let commands = [
+    "ufw default deny incoming",
+    "ufw default allow outgoing",
+    "ufw allow 80",
+    "ufw allow 443",
+    "ufw allow ssh",
+    'sed -i "$ a DEFAULT_FORWARD_POLICY=\\"ACCEPT\\"" /etc/default/ufw',
+    "ufw enable",
+    "ufw reload",
+    "mkdir app && cd app",
+    `echo "${dockerComposeData}" | base64 -d > docker-compose.yml`,
+  ];
+
+  // Sign into Docker to access private repositories
+  const dockerUsername = process.env.HETZNER_DOCKER_USERNAME;
+  const dockerToken = process.env.HETZNER_DOCKER_TOKEN;
+  if (dockerUsername && dockerToken) {
+    commands.push(`docker login -u ${dockerUsername} -p ${dockerToken}`);
+  }
+
+  commands.push("docker-compose up -d");
+
   const configYaml = yaml.stringify(
     {
       packages: ["ufw", "docker", "docker-compose"],
       package_update: true,
       package_upgrade: true,
-      runcmd: [
-        "ufw default deny incoming",
-        "ufw default allow outgoing",
-        "ufw allow 80",
-        "ufw allow 443",
-        "ufw allow ssh",
-        'sed -i "$ a DEFAULT_FORWARD_POLICY=\\"ACCEPT\\"" /etc/default/ufw',
-        "ufw enable",
-        "ufw reload",
-        "mkdir app && cd app",
-        `echo "${dockerComposeData}" | base64 -d > docker-compose.yml`,
-        "docker-compose up -d",
-      ],
+      runcmd: commands,
     },
     { lineWidth: -1 }
   );
