@@ -86,6 +86,15 @@ By default every server will run in addition to the given docker image, an [ngin
 
 You can export the cloud configuration into a yaml template and then import it later without recreating the cloud resources. Simply define your cloud resources and then call `const template = await cdk.export()` instead of `cdk.run()`. The function will return the yaml template that you can import later with `await CDK.import(template)`.
 
+## Private Docker Repositories
+
+Set the following two environment variables to allow Docker pull private repositories:
+
+```
+HETZNER_DOCKER_USERNAME=xxx
+HETZNER_DOCKER_TOKEN=xxx
+```
+
 ## Examples
 
 CDK examples can be found in the [examples folder](./examples).
