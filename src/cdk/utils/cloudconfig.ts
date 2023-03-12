@@ -73,8 +73,9 @@ export function defaultCloudConfig(options: ServerOptions): string {
   // Sign into Docker to access private repositories
   const dockerUsername = process.env.HETZNER_DOCKER_USERNAME;
   const dockerToken = process.env.HETZNER_DOCKER_TOKEN;
+  const dockerRegistry = process.env.HETZNER_DOCKER_REGISTRY ?? "";
   if (dockerUsername && dockerToken) {
-    commands.push(`docker login -u ${dockerUsername} -p ${dockerToken}`);
+    commands.push(`docker login -u ${dockerUsername} -p ${dockerToken} ${dockerRegistry}`);
   }
 
   commands.push("docker-compose up -d");

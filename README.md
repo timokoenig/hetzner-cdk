@@ -93,6 +93,7 @@ Set the following two environment variables to allow Docker pull private reposit
 ```
 HETZNER_DOCKER_USERNAME=xxx
 HETZNER_DOCKER_TOKEN=xxx
+HETZNER_DOCKER_REGISTRY=xxx
 ```
 
 ## Examples
